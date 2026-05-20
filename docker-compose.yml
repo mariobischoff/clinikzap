@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: clinikzap-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - clinikzap-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: clinikzap-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - clinikzap-net
+
+  evolution-api:
+    image: evoapicloud/evolution-api:v2.3.1
+    container_name: clinikzap-evolution-api
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      # General Settings
+      - SERVER_PORT=8080
+      - AUTHENTICATION_TYPE=apikey
+      - AUTHENTICATION_API_KEY=42a83c48-8424-4f9e-a843-982823a35cfb
+      
+      # Database Settings
+      - DATABASE_ENABLED=true
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://postgres:postgres@postgres:5432/evolution?schema=public
+      
+      
+      # Cache Settings (Redis)
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://redis:6379
+      - CACHE_REDIS_PREFIX_KEY=evolution
+      - CACHE_LOCAL_ENABLED=false
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - clinikzap-net
+
+networks:
+  clinikzap-net:
+    driver: bridge
+
+volumes:
+  postgres_data:

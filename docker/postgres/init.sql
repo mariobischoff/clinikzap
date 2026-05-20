@@ -1,0 +1,2 @@
+CREATE DATABASE clinikzap;
+CREATE DATABASE evolution;

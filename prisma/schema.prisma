@@ -1,0 +1,53 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String        // Hashed password
+  name         String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  customers    Customer[]
+  appointments Appointment[]
+}
+
+model Customer {
+  id           String        @id @default(uuid())
+  name         String
+  phone        String        // E.164 format (e.g. +5511999999999)
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // A phone number must be unique per clinic/user
+  @@unique([phone, userId])
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+}
+
+model Appointment {
+  id              String            @id @default(uuid())
+  customerId      String
+  customer        Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointmentDate DateTime
+  status          AppointmentStatus @default(PENDING)
+  token           String            @unique @default(uuid()) // Unique public link token
+  reminderSent    Boolean           @default(false)          // To avoid duplicate notifications
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
