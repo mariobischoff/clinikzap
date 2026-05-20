@@ -47,6 +47,7 @@ O sistema permite que o paciente receba um link dinâmico e seguro para escolher
 │   ├── components/         # Componentes reutilizáveis de UI
 │   ├── lib/                # Configurações do Prisma, utilitários, etc.
 │   └── services/           # Comunicação com a Evolution API
+├── tests/                  # Mocks e scripts de testes automatizados locais
 ├── docker-compose.yml      # Orquestração do Postgres, Redis e Evolution API
 ├── .env.example            # Modelo de variáveis de ambiente
 └── .gitignore              # Proteção para não commitar dependências e chaves locais
@@ -117,6 +118,21 @@ Para testar o recebimento de mensagens e o agendamento em aparelhos reais estand
    NEXT_PUBLIC_APP_URL="https://sua-url.loca.lt"
    ```
 4. Acesse o dashboard administrativo (`http://localhost:3000/dashboard/evolution`), escaneie o QR Code com o seu WhatsApp e peça para um amigo enviar uma mensagem para o número pareado.
+
+---
+
+## 🧪 Testes Locais Automatizados
+
+O projeto conta com scripts utilitários na pasta `tests/` para simular requisições locais (webhooks e cron jobs) sem a necessidade de enviar mensagens reais pelo celular:
+
+- **Simular Mensagem de Webhook:** Simula o recebimento de uma mensagem de paciente no WhatsApp para gerar o link dinâmico:
+  ```bash
+  node tests/test-webhook.js
+  ```
+- **Simular Cron de Lembretes:** Aciona manualmente a rotina de envio de lembretes para consultas marcadas para o dia seguinte:
+  ```bash
+  node tests/test-cron.js
+  ```
 
 ---
 

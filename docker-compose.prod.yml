@@ -66,6 +66,7 @@ services:
       - EVOLUTION_INSTANCE_NAME=clinikzap
       - AUTH_SECRET=${AUTH_SECRET}
       - EVOLUTION_SEND_IN_DEV=false
+      - AUTH_TRUST_HOST=true
       - NEXT_PUBLIC_APP_URL=https://clinikzap.mariotech.com.br
       - NEXT_PUBLIC_WEBHOOK_URL=https://clinikzap.mariotech.com.br/api/webhook/whatsapp
     depends_on:
