@@ -13,6 +13,7 @@
     "@prisma/client": "^6.4.0",
     "bcryptjs": "^2.4.3",
     "framer-motion": "^11.18.2",
+    "ioredis": "^5.10.1",
     "lucide-react": "^0.475.0",
     "next": "15.1.7",
     "next-auth": "5.0.0-beta.25",

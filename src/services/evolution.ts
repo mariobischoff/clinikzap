@@ -30,7 +30,17 @@ export class EvolutionService {
         console.log(`[EvolutionService] Instance "${instanceName}" already exists.`);
       }
 
-      await this.registerWebhook(instanceName);
+      const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
+      if (webhookUrl) {
+        const isConfigured = await this.isWebhookConfigured(instanceName, webhookUrl);
+        if (!isConfigured) {
+          await this.registerWebhook(instanceName);
+        } else {
+          console.log(`[EvolutionService] Webhook is already configured and matching for "${instanceName}". Skipping registration.`);
+        }
+      } else {
+        console.warn('[EvolutionService] NEXT_PUBLIC_WEBHOOK_URL is not defined. Skipping webhook registration.');
+      }
     } catch (error) {
       console.error('[EvolutionService] Failed to initialize instance:', error);
       throw error;
@@ -118,11 +128,41 @@ export class EvolutionService {
   }
 
   /**
+   * Checks if webhook is configured for the instance and matches the expected URL
+   */
+  static async isWebhookConfigured(instanceName: string, expectedUrl: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.apiUrl}/webhook/find/${instanceName}`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = await response.json();
+      // If webhook is defined, enabled, and points to the same url, return true
+      return !!(data && data.enabled === true && data.url === expectedUrl);
+    } catch (error) {
+      console.error(`[EvolutionService] Error checking webhook configuration for ${instanceName}:`, error);
+      return false;
+    }
+  }
+
+  /**
    * Sends a text message to a specific number
    */
   static async sendTextMessage(phone: string, text: string, instanceName: string = this.defaultInstance): Promise<unknown> {
     // Standardize phone format (remove non-digits and ensure E.164 without prefix + is supported by Evolution API)
     const cleanPhone = phone.replace(/\D/g, '');
+
+    if (process.env.NODE_ENV === 'development' && process.env.EVOLUTION_SEND_IN_DEV !== 'true') {
+      console.log(`[Development Mode] Intercepted WhatsApp message to ${cleanPhone}:`);
+      console.log(`Message Content:\n${text}`);
+      return { success: true, message: 'Message logged to console in development environment' };
+    }
 
     const response = await fetch(`${this.apiUrl}/message/sendText/${instanceName}`, {
       method: 'POST',
@@ -182,7 +222,7 @@ export class EvolutionService {
    */
   static async logoutInstance(instanceName: string = this.defaultInstance): Promise<unknown> {
     const response = await fetch(`${this.apiUrl}/instance/logout/${instanceName}`, {
-      method: 'POST',
+      method: 'DELETE',
       headers: this.getHeaders(),
     });
 

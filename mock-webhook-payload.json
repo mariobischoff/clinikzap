@@ -1,0 +1,16 @@
+{
+  "event": "messages.upsert",
+  "instanceId": "50352ef2-c0cb-4659-ad07-063a8a38ec9d",
+  "data": {
+    "key": {
+      "remoteJid": "5511999999999@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0C6E97E106D4"
+    },
+    "pushName": "John Doe",
+    "messageType": "conversation",
+    "message": {
+      "conversation": "Hi, I want to book an appointment"
+    }
+  }
+}

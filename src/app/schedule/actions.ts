@@ -65,8 +65,24 @@ export async function getAvailableSlots(dateStr: string, userId: string): Promis
     const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
 
-    // Standard business hours slots
-    const standardSlots = [
+    // To get correct weekday (0 = Sunday, 1 = Monday, etc.) without timezone distortion
+    const dayOfWeek = new Date(dateStr + 'T00:00:00').getDay();
+
+    // Fetch clinic weekly hours and potential date exceptions for the target date
+    const clinic = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        weeklyHours: true,
+        workingHours: true,
+        availabilityExceptions: {
+          where: {
+            date: dateStr,
+          },
+        },
+      },
+    });
+
+    const defaultSlots = [
       '08:00',
       '09:00',
       '10:00',
@@ -77,6 +93,27 @@ export async function getAvailableSlots(dateStr: string, userId: string): Promis
       '16:00',
       '17:00',
     ];
+
+    let standardSlots: string[] = [];
+
+    const exception = clinic?.availabilityExceptions?.[0];
+    if (exception) {
+      // If there's an exception, use its custom slots (empty array means fully blocked)
+      standardSlots = exception.slots;
+    } else {
+      // If no exception, use weekly hours for this weekday
+      const weeklyHoursObj = (clinic?.weeklyHours as Record<string, string[]>) || {};
+      const daySlots = weeklyHoursObj[String(dayOfWeek)];
+      
+      if (daySlots) {
+        standardSlots = daySlots;
+      } else {
+        // Fallback to legacy workingHours or defaultSlots
+        standardSlots = clinic?.workingHours && clinic.workingHours.length > 0
+          ? clinic.workingHours
+          : defaultSlots;
+      }
+    }
 
     // Find all confirmed appointments for this clinic on this date
     const bookedAppointments = await prisma.appointment.findMany({

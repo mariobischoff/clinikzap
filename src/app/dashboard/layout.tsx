@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import Link from 'next/link';
-import { Calendar, MessageSquare } from 'lucide-react';
+import SidebarNav from './sidebar-nav';
 import SignOutButton from './signout-button';
 
 interface DashboardLayoutProps {
@@ -33,23 +33,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
           </div>
 
           {/* Navigation Links */}
-          <nav className="p-4 space-y-2">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-800/50 border border-slate-800 text-teal-400 font-semibold text-sm transition-all"
-            >
-              <Calendar className="w-4 h-4" />
-              Agenda / Agendamentos
-            </Link>
-
-            <Link
-              href="/dashboard/evolution"
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-800/30 text-slate-400 hover:text-slate-200 text-sm transition-all border border-transparent"
-            >
-              <MessageSquare className="w-4 h-4" />
-              WhatsApp (Evolution)
-            </Link>
-          </nav>
+          <SidebarNav />
         </div>
 
         {/* User Info / LogOut */}

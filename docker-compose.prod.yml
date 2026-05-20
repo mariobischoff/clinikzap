@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: clinikzap-postgres-prod
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=clinikzap
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - clinikzap-net-prod
+
+  redis:
+    image: redis:7-alpine
+    container_name: clinikzap-redis-prod
+    restart: always
+    volumes:
+      - redis_data_prod:/data
+    networks:
+      - clinikzap-net-prod
+
+  evolution-api:
+    image: evoapicloud/evolution-api:v2.3.1
+    container_name: clinikzap-evolution-api-prod
+    restart: always
+    environment:
+      # General Settings
+      - SERVER_PORT=8080
+      - AUTHENTICATION_TYPE=apikey
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY}
+      
+      # Database Settings
+      - DATABASE_ENABLED=true
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/clinikzap?schema=evolution
+      
+      # Cache Settings (Redis)
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://redis:6379
+      - CACHE_REDIS_PREFIX_KEY=evolution
+      - CACHE_LOCAL_ENABLED=false
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - clinikzap-net-prod
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clinikzap-app-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/clinikzap?schema=public
+      - REDIS_URL=redis://redis:6379
+      - EVOLUTION_API_URL=http://evolution-api:8080
+      - EVOLUTION_API_KEY=${EVOLUTION_API_KEY}
+      - EVOLUTION_INSTANCE_NAME=clinikzap
+      - AUTH_SECRET=${AUTH_SECRET}
+      - EVOLUTION_SEND_IN_DEV=false
+      - NEXT_PUBLIC_APP_URL=https://clinikzap.mariotech.com.br
+      - NEXT_PUBLIC_WEBHOOK_URL=https://clinikzap.mariotech.com.br/api/webhook/whatsapp
+    depends_on:
+      - postgres
+      - redis
+      - evolution-api
+    networks:
+      - clinikzap-net-prod
+
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: clinikzap-npm-prod
+    restart: always
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+    networks:
+      - clinikzap-net-prod
+
+networks:
+  clinikzap-net-prod:
+    driver: bridge
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
+  npm_data:
+  npm_letsencrypt:

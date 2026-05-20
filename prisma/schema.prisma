@@ -8,14 +8,17 @@ generator client {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  password     String        // Hashed password
-  name         String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  customers    Customer[]
-  appointments Appointment[]
+  id                     String                  @id @default(uuid())
+  email                  String                  @unique
+  password               String                  // Hashed password
+  name                   String
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  customers              Customer[]
+  appointments           Appointment[]
+  workingHours           String[]                @default(["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"])
+  weeklyHours            Json?                   // e.g. {"1": ["08:00", "09:00"], ...}
+  availabilityExceptions AvailabilityException[]
 }
 
 model Customer {
@@ -50,4 +53,16 @@ model Appointment {
   reminderSent    Boolean           @default(false)          // To avoid duplicate notifications
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+}
+
+model AvailabilityException {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      String   // Format: "YYYY-MM-DD"
+  slots     String[] // Custom slots. If empty array, the day is blocked.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
 }
