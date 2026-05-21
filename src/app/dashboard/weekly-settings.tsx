@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { updateWeeklyHours } from './actions';
-import { Check, Save, Calendar } from 'lucide-react';
+import { updateWeeklyHours, updateClinicDuration } from './actions';
+import { Check, Save, Calendar, Clock } from 'lucide-react';
 
 interface WeeklySettingsProps {
   initialWeeklyHours: Record<string, string[]>;
+  initialDuration: number;
 }
 
 const WEEKDAYS = [
@@ -18,12 +19,26 @@ const WEEKDAYS = [
   { index: '0', name: 'Domingo' },
 ];
 
-const ALL_POSSIBLE_SLOTS = Array.from({ length: 15 }, (_, i) => {
-  const hour = String(i + 7).padStart(2, '0');
-  return `${hour}:00`;
-});
+export function generateSlotsForDuration(durationMinutes: number): string[] {
+  const slots: string[] = [];
+  const startHour = 7;
+  const endHour = 22; // 07:00 to 22:00
+  let currentMins = startHour * 60;
+  const endMins = endHour * 60;
+  
+  while (currentMins <= endMins) {
+    const hours = Math.floor(currentMins / 60);
+    const minutes = currentMins % 60;
+    slots.push(`${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`);
+    currentMins += durationMinutes;
+  }
+  return slots;
+}
 
-export default function WeeklySettings({ initialWeeklyHours }: WeeklySettingsProps) {
+export default function WeeklySettings({ initialWeeklyHours, initialDuration }: WeeklySettingsProps) {
+  const [duration, setDuration] = useState<number>(initialDuration);
+  const [isUpdatingDuration, startDurationTransition] = useTransition();
+
   // Ensure we have a default list of slots for each day if not set in DB
   const normalizeWeeklyHours = () => {
     const hours: Record<string, string[]> = {};
@@ -40,6 +55,7 @@ export default function WeeklySettings({ initialWeeklyHours }: WeeklySettingsPro
 
   const activeDayName = WEEKDAYS.find((d) => d.index === selectedDay)?.name || '';
   const currentDaySlots = weeklyHours[selectedDay] || [];
+  const allPossibleSlots = generateSlotsForDuration(duration);
 
   const handleToggleSlot = (slot: string) => {
     setWeeklyHours((prev) => {
@@ -57,7 +73,7 @@ export default function WeeklySettings({ initialWeeklyHours }: WeeklySettingsPro
   const handleSelectAllForDay = () => {
     setWeeklyHours((prev) => ({
       ...prev,
-      [selectedDay]: ALL_POSSIBLE_SLOTS,
+      [selectedDay]: allPossibleSlots,
     }));
   };
 
@@ -66,6 +82,19 @@ export default function WeeklySettings({ initialWeeklyHours }: WeeklySettingsPro
       ...prev,
       [selectedDay]: [],
     }));
+  };
+
+  const handleDurationChange = (newDuration: number) => {
+    setMessage(null);
+    startDurationTransition(async () => {
+      const result = await updateClinicDuration(newDuration);
+      if (result.success) {
+        setDuration(newDuration);
+        setMessage({ type: 'success', text: 'Duração da consulta atualizada com sucesso!' });
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Erro ao atualizar duração.' });
+      }
+    });
   };
 
   const handleSave = () => {
@@ -82,6 +111,34 @@ export default function WeeklySettings({ initialWeeklyHours }: WeeklySettingsPro
 
   return (
     <div className="space-y-6">
+      {/* Configuration of default slot duration */}
+      <div className="bg-slate-950/40 border border-slate-850 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
+            <Clock className="w-5 h-5 text-teal-400" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-slate-200">Duração Padrão da Consulta</h4>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Escolha a duração de cada sessão. O grid de horários abaixo será recalculado.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <select
+            value={duration}
+            disabled={isUpdatingDuration}
+            onChange={(e) => handleDurationChange(Number(e.target.value))}
+            className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-teal-500/50 transition-all cursor-pointer [color-scheme:dark]"
+          >
+            <option value={30}>30 minutos</option>
+            <option value={45}>45 minutos</option>
+            <option value={60}>1 hora (60 min)</option>
+          </select>
+          {isUpdatingDuration && <div className="w-4 h-4 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />}
+        </div>
+      </div>
+
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left Side: Weekdays list */}
         <div className="w-full md:w-64 shrink-0 space-y-2">
@@ -155,7 +212,7 @@ export default function WeeklySettings({ initialWeeklyHours }: WeeklySettingsPro
 
           {/* Grid of Slots */}
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            {ALL_POSSIBLE_SLOTS.map((slot) => {
+            {allPossibleSlots.map((slot) => {
               const isSelected = currentDaySlots.includes(slot);
               return (
                 <button

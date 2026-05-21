@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar as CalendarIcon, Clock, User, Phone, CheckCircle, AlertCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, User, Phone, CheckCircle, AlertCircle, Plus } from 'lucide-react';
 import CopyLinkButton from './copy-link-button';
 import AppointmentActions from './appointment-actions';
+import NewAppointmentModal from './new-appointment-modal';
 
 interface Customer {
   id: string;
@@ -51,6 +52,7 @@ function formatPhone(phone: string) {
 
 export default function AppointmentsTable({ initialAppointments }: AppointmentsTableProps) {
   const [filter, setFilter] = useState<'active' | 'canceled' | 'all'>('active');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredAppointments = initialAppointments.filter((app) => {
     if (filter === 'active') {
@@ -71,8 +73,19 @@ export default function AppointmentsTable({ initialAppointments }: AppointmentsT
           Fila de Agendamentos
         </h2>
 
-        {/* Filter controls */}
-        <div className="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-850 self-start">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Novo Agendamento Button */}
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-2xl text-xs transition-all cursor-pointer shadow-md shadow-teal-500/10 active:scale-95"
+          >
+            <Plus className="w-4 h-4 text-slate-950 stroke-[3]" />
+            Novo Agendamento
+          </button>
+
+          {/* Filter controls */}
+          <div className="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-850 self-start">
           <button
             type="button"
             onClick={() => setFilter('active')}
@@ -108,6 +121,7 @@ export default function AppointmentsTable({ initialAppointments }: AppointmentsT
           </button>
         </div>
       </div>
+    </div>
 
       {filteredAppointments.length === 0 ? (
         <div className="text-center py-12 text-slate-500 text-sm bg-slate-900/20 border border-slate-850 rounded-3xl">
@@ -209,6 +223,9 @@ export default function AppointmentsTable({ initialAppointments }: AppointmentsT
           </table>
         </div>
       )}
+
+      {/* New Appointment Modal */}
+      <NewAppointmentModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }

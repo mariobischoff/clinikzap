@@ -55,8 +55,6 @@ services:
       dockerfile: Dockerfile
     container_name: clinikzap-app-prod
     restart: always
-    ports:
-      - "3000:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/clinikzap?schema=public

@@ -14,11 +14,13 @@ interface ExceptionRecord {
 interface AvailabilitySettingsProps {
   initialWeeklyHours: Record<string, string[]>;
   exceptions: ExceptionRecord[];
+  initialDuration: number;
 }
 
 export default function AvailabilitySettings({
   initialWeeklyHours,
   exceptions,
+  initialDuration,
 }: AvailabilitySettingsProps) {
   const [subTab, setSubTab] = useState<'weekly' | 'exceptions'>('weekly');
 
@@ -69,9 +71,9 @@ export default function AvailabilitySettings({
       {/* Sub Tabs Content */}
       <div className="pt-2">
         {subTab === 'weekly' ? (
-          <WeeklySettings initialWeeklyHours={initialWeeklyHours} />
+          <WeeklySettings initialWeeklyHours={initialWeeklyHours} initialDuration={initialDuration} />
         ) : (
-          <ExceptionSettings exceptions={exceptions} />
+          <ExceptionSettings exceptions={exceptions} duration={initialDuration} />
         )}
       </div>
     </div>

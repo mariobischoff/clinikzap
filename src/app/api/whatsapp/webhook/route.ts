@@ -1,3 +1,3 @@
-import { POST as whatsappPostHandler } from '../../webhook/whatsapp/route';
+import { POST as whatsappPostHandler } from '../../webhook/whatsapp/[[...event]]/route';
 
 export const POST = whatsappPostHandler;

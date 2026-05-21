@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { WhatsappService } from '@/services/whatsapp.service';
+import { parseTemplate } from '@/utils/template-parser';
 
 interface RescheduleRequestBody {
   appointmentId: string;
@@ -67,9 +68,19 @@ export async function POST(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const scheduleLink = `${appUrl}/schedule/${transactionResult.rescheduled.token}`;
     
-    const patientMessage = `Olá, ${originalAppointment.customer.name}! Devido a um imprevisto na clínica, precisamos reagendar sua consulta com a clínica *${originalAppointment.user.name}*. Pedimos desculpas pelo transtorno. Por favor, acesse o link abaixo para escolher um novo horário conveniente para você:\n\n${scheduleLink}`;
+    const template = `Olá, *{nome_paciente}*! Devido a um imprevisto na clínica, precisamos reagendar sua consulta com a clínica *{nome_clinica}*. Pedimos desculpas pelo transtorno. Por favor, acesse o link abaixo para escolher um novo horário conveniente para você:\n\n{link_consulta}`;
 
-    await WhatsappService.sendTextMessage(originalAppointment.customer.phone, patientMessage);
+    const patientMessage = parseTemplate(template, {
+      nome_paciente: originalAppointment.customer.name,
+      nome_clinica: originalAppointment.user.name || 'Clínica',
+      link_consulta: scheduleLink,
+    });
+
+    try {
+      await WhatsappService.sendTextMessage(originalAppointment.customer.phone, patientMessage);
+    } catch (msgError) {
+      console.error('[Appointment Reschedule] Failed to send WhatsApp reschedule message:', msgError);
+    }
 
     return NextResponse.json({
       message: 'Appointment successfully rescheduled by clinic',

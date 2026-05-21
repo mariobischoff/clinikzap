@@ -2,6 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import { EvolutionService } from '@/services/evolution';
+import { parseTemplate } from '@/utils/template-parser';
 
 export interface AppointmentDetails {
   id: string;
@@ -74,6 +75,7 @@ export async function getAvailableSlots(dateStr: string, userId: string): Promis
       select: {
         weeklyHours: true,
         workingHours: true,
+        duration: true,
         availabilityExceptions: {
           where: {
             date: dateStr,
@@ -81,18 +83,6 @@ export async function getAvailableSlots(dateStr: string, userId: string): Promis
         },
       },
     });
-
-    const defaultSlots = [
-      '08:00',
-      '09:00',
-      '10:00',
-      '11:00',
-      '13:00',
-      '14:00',
-      '15:00',
-      '16:00',
-      '17:00',
-    ];
 
     let standardSlots: string[] = [];
 
@@ -108,10 +98,25 @@ export async function getAvailableSlots(dateStr: string, userId: string): Promis
       if (daySlots) {
         standardSlots = daySlots;
       } else {
-        // Fallback to legacy workingHours or defaultSlots
-        standardSlots = clinic?.workingHours && clinic.workingHours.length > 0
-          ? clinic.workingHours
-          : defaultSlots;
+        // Fallback to generating slots dynamically using clinic duration (default 30m)
+        const duration = clinic?.duration ?? 30;
+        const slots: string[] = [];
+        
+        // Generate standard morning slots (08:00 to 12:00) and afternoon slots (13:00 to 18:00)
+        const generateRange = (startHr: number, endHr: number) => {
+          let current = startHr * 60;
+          const end = endHr * 60;
+          while (current < end) {
+            const h = Math.floor(current / 60);
+            const m = current % 60;
+            slots.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+            current += duration;
+          }
+        };
+        
+        generateRange(8, 12);
+        generateRange(13, 18);
+        standardSlots = slots;
       }
     }
 
@@ -201,7 +206,14 @@ export async function confirmAppointment(
       year: 'numeric',
     });
 
-    const confirmationText = `Olá, *${customerName}*!\n\nConfirmamos seu agendamento na clínica *${appointment.user.name}*:\n\n📅 Data: *${dateFormatted}*\n⏰ Horário: *${timeStr}*\n\nSeu agendamento foi salvo com sucesso!`;
+    const template = appointment.user.confirmationTemplate || `Olá, *{nome_paciente}*!\n\nConfirmamos seu agendamento na clínica *{nome_clinica}*:\n\n📅 Data: *{data_consulta}*\n⏰ Horário: *{hora_consulta}*\n\nSeu agendamento foi salvo com sucesso!`;
+
+    const confirmationText = parseTemplate(template, {
+      nome_paciente: customerName,
+      nome_clinica: appointment.user.name || 'Clínica',
+      data_consulta: dateFormatted,
+      hora_consulta: timeStr,
+    });
 
     try {
       await EvolutionService.sendTextMessage(appointment.customer.phone, confirmationText);

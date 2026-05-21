@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Calendar, MessageSquare } from 'lucide-react';
+import { Calendar, MessageSquare, Users } from 'lucide-react';
 
 export default function SidebarNav() {
   const pathname = usePathname();
@@ -15,8 +15,14 @@ export default function SidebarNav() {
       exact: true,
     },
     {
+      href: '/dashboard/customers',
+      label: 'Pacientes',
+      icon: Users,
+      exact: false,
+    },
+    {
       href: '/dashboard/evolution',
-      label: 'WhatsApp (Evolution)',
+      label: 'WhatsApp',
       icon: MessageSquare,
       exact: false,
     },

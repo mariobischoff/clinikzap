@@ -1,8 +1,10 @@
 import { auth } from '@/auth';
 import prisma from '@/lib/prisma';
-import AppointmentsTable from './appointments-table';
+import AppointmentsViewWrapper from './appointments-view-wrapper';
 import AvailabilitySettings from './availability-settings';
 import DashboardTabs from './dashboard-tabs';
+import NotificationSettings from './notification-settings';
+import AnalyticsPanel from './analytics-panel';
 
 // Dynamically render dashboard page to fetch latest data on reload
 export const dynamic = 'force-dynamic';
@@ -30,11 +32,16 @@ export default async function DashboardPage() {
     },
   });
 
-  // Fetch user working hours and exceptions
+  // Fetch user working hours, exceptions, and templates
   const userRecord = await prisma.user.findUnique({
     where: { id: userId },
     select: {
       weeklyHours: true,
+      duration: true,
+      confirmationTemplate: true,
+      cancellationTemplate: true,
+      reminderTemplate: true,
+      reminderHours: true,
       availabilityExceptions: {
         orderBy: {
           date: 'asc',
@@ -45,6 +52,11 @@ export default async function DashboardPage() {
 
   const weeklyHours = (userRecord?.weeklyHours as Record<string, string[]>) || {};
   const exceptions = userRecord?.availabilityExceptions || [];
+  const duration = userRecord?.duration ?? 30;
+  const confirmationTemplate = userRecord?.confirmationTemplate ?? null;
+  const cancellationTemplate = userRecord?.cancellationTemplate ?? null;
+  const reminderTemplate = userRecord?.reminderTemplate ?? null;
+  const reminderHours = userRecord?.reminderHours ?? 24;
 
   // Calculate statistics
   const total = appointments.length;
@@ -53,7 +65,7 @@ export default async function DashboardPage() {
   const canceled = appointments.filter((a) => a.status === 'CANCELED').length;
 
   const appointmentsQueue = (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Metrics Widgets */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg">
@@ -77,15 +89,29 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* Analytics Panel Component */}
+      <AnalyticsPanel appointments={appointments} />
+
       {/* Main Agenda Section */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-lg">
-        <AppointmentsTable initialAppointments={appointments} />
-      </div>
+      <AppointmentsViewWrapper initialAppointments={appointments} />
     </div>
   );
 
   const availabilitySettings = (
-    <AvailabilitySettings initialWeeklyHours={weeklyHours} exceptions={exceptions} />
+    <AvailabilitySettings
+      initialWeeklyHours={weeklyHours}
+      exceptions={exceptions}
+      initialDuration={duration}
+    />
+  );
+
+  const notificationSettings = (
+    <NotificationSettings
+      initialConfirmationTemplate={confirmationTemplate}
+      initialCancellationTemplate={cancellationTemplate}
+      initialReminderTemplate={reminderTemplate}
+      initialReminderHours={reminderHours}
+    />
   );
 
   return (
@@ -101,6 +127,7 @@ export default async function DashboardPage() {
       <DashboardTabs
         appointmentsQueue={appointmentsQueue}
         availabilitySettings={availabilitySettings}
+        notificationSettings={notificationSettings}
       />
     </div>
   );

@@ -3,6 +3,9 @@
 import { useState, useTransition } from 'react';
 import { setAvailabilityException, deleteAvailabilityException } from './actions';
 import { Calendar, Plus, Trash2, Clock, Ban } from 'lucide-react';
+import { generateSlotsForDuration } from './weekly-settings';
+import { toast } from 'sonner';
+import ConfirmationModal from '@/components/confirmation-modal';
 
 interface ExceptionRecord {
   id: string;
@@ -12,19 +15,17 @@ interface ExceptionRecord {
 
 interface ExceptionSettingsProps {
   exceptions: ExceptionRecord[];
+  duration: number;
 }
 
-const ALL_POSSIBLE_SLOTS = Array.from({ length: 15 }, (_, i) => {
-  const hour = String(i + 7).padStart(2, '0');
-  return `${hour}:00`;
-});
-
-export default function ExceptionSettings({ exceptions }: ExceptionSettingsProps) {
+export default function ExceptionSettings({ exceptions, duration }: ExceptionSettingsProps) {
+  const allPossibleSlots = generateSlotsForDuration(duration);
   const [dateStr, setDateStr] = useState<string>('');
   const [blockAllDay, setBlockAllDay] = useState<boolean>(true);
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [exceptionToDelete, setExceptionToDelete] = useState<string | null>(null);
 
   // Set minimum date picker to today
   const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local format
@@ -37,11 +38,13 @@ export default function ExceptionSettings({ exceptions }: ExceptionSettingsProps
 
   const handleSaveException = () => {
     if (!dateStr) {
+      toast.error('Por favor, selecione uma data.');
       setMessage({ type: 'error', text: 'Por favor, selecione uma data.' });
       return;
     }
 
     if (!blockAllDay && selectedSlots.length === 0) {
+      toast.error('Selecione pelo menos um horário ou bloqueie o dia todo.');
       setMessage({ type: 'error', text: 'Selecione pelo menos um horário ou bloqueie o dia todo.' });
       return;
     }
@@ -50,25 +53,29 @@ export default function ExceptionSettings({ exceptions }: ExceptionSettingsProps
     startTransition(async () => {
       const result = await setAvailabilityException(dateStr, selectedSlots, blockAllDay);
       if (result.success) {
+        toast.success('Exceção de agenda salva com sucesso!');
         setMessage({ type: 'success', text: 'Exceção de agenda salva com sucesso!' });
         setDateStr('');
         setSelectedSlots([]);
       } else {
+        toast.error(result.error || 'Erro ao salvar exceção.');
         setMessage({ type: 'error', text: result.error || 'Erro ao salvar exceção.' });
       }
     });
   };
 
   const handleDeleteException = (id: string) => {
-    if (!confirm('Deseja realmente remover esta exceção e restaurar o horário semanal padrão para este dia?')) {
-      return;
-    }
+    setExceptionToDelete(id);
+  };
 
+  const executeDeleteException = (id: string) => {
     startTransition(async () => {
       const result = await deleteAvailabilityException(id);
       if (result.success) {
+        toast.success('Exceção removida com sucesso!');
         setMessage({ type: 'success', text: 'Exceção removida com sucesso!' });
       } else {
+        toast.error(result.error || 'Erro ao remover exceção.');
         setMessage({ type: 'error', text: result.error || 'Erro ao remover exceção.' });
       }
     });
@@ -142,7 +149,7 @@ export default function ExceptionSettings({ exceptions }: ExceptionSettingsProps
               Selecione os horários disponíveis para este dia
             </span>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {ALL_POSSIBLE_SLOTS.map((slot) => {
+              {allPossibleSlots.map((slot) => {
                 const isSelected = selectedSlots.includes(slot);
                 return (
                   <button
@@ -259,6 +266,20 @@ export default function ExceptionSettings({ exceptions }: ExceptionSettingsProps
           )}
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={!!exceptionToDelete}
+        title="Remover Exceção"
+        message="Deseja realmente remover esta exceção e restaurar o horário semanal padrão para este dia?"
+        confirmText="Confirmar"
+        cancelText="Voltar"
+        isDanger={true}
+        onConfirm={() => {
+          if (exceptionToDelete) executeDeleteException(exceptionToDelete);
+          setExceptionToDelete(null);
+        }}
+        onCancel={() => setExceptionToDelete(null)}
+      />
     </div>
   );
 }

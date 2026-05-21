@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { WhatsappService } from '@/services/whatsapp.service';
+import { parseTemplate } from '@/utils/template-parser';
 
 interface CancelRequestBody {
   token: string;
@@ -44,10 +45,35 @@ export async function POST(req: NextRequest) {
 
     console.log(`[Appointment Cancel] Successfully canceled appointment ID ${appointment.id} for customer ${appointment.customer.name}`);
 
-    // 3. Trigger mock WhatsApp service
-    const patientMessage = `Olá, ${appointment.customer.name}! Confirmamos que o agendamento da sua consulta com a clínica *${appointment.user.name}* foi cancelado com sucesso. O horário foi liberado em nossa agenda. Se desejar realizar um novo agendamento no futuro, por favor entre em contato conosco.`;
+    // 3. Trigger mock WhatsApp service using templates
+    const dateFormatted = appointment.appointmentDate
+      ? new Date(appointment.appointmentDate).toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        })
+      : '';
+    const timeFormatted = appointment.appointmentDate
+      ? new Date(appointment.appointmentDate).toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : '';
 
-    await WhatsappService.sendTextMessage(appointment.customer.phone, patientMessage);
+    const template = appointment.user.cancellationTemplate || `Olá, *{nome_paciente}*.\n\nSua consulta na clínica *{nome_clinica}* agendada para *{data_consulta}* às *{hora_consulta}* foi cancelada.`;
+
+    const patientMessage = parseTemplate(template, {
+      nome_paciente: appointment.customer.name,
+      nome_clinica: appointment.user.name || 'Clínica',
+      data_consulta: dateFormatted,
+      hora_consulta: timeFormatted,
+    });
+
+    try {
+      await WhatsappService.sendTextMessage(appointment.customer.phone, patientMessage);
+    } catch (msgError) {
+      console.error('[Appointment Cancel] Failed to send WhatsApp cancellation message:', msgError);
+    }
 
     return NextResponse.json({
       message: 'Appointment successfully canceled',

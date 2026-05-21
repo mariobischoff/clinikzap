@@ -16,6 +16,23 @@ export class EvolutionService {
   }
 
   /**
+   * Helper to perform fetch requests with a timeout
+   */
+  private static async fetchWithTimeout(url: string, options: RequestInit & { timeout?: number } = {}): Promise<Response> {
+    const { timeout = 5000, ...fetchOptions } = options;
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+      return await fetch(url, {
+        ...fetchOptions,
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(id);
+    }
+  }
+
+  /**
    * Helper to ensure the Evolution API instance is created and has the webhook registered.
    */
   static async initInstance(instanceName: string = this.defaultInstance): Promise<void> {
@@ -29,6 +46,9 @@ export class EvolutionService {
       } else {
         console.log(`[EvolutionService] Instance "${instanceName}" already exists.`);
       }
+
+      // Configure instance settings (disable history sync, ignore groups)
+      await this.setSettings(instanceName);
 
       const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
       if (webhookUrl) {
@@ -52,7 +72,7 @@ export class EvolutionService {
    */
   static async instanceExists(instanceName: string): Promise<boolean> {
     try {
-      const response = await fetch(`${this.apiUrl}/instance/fetchInstances`, {
+      const response = await this.fetchWithTimeout(`${this.apiUrl}/instance/fetchInstances`, {
         method: 'GET',
         headers: this.getHeaders(),
         cache: 'no-store',
@@ -75,7 +95,7 @@ export class EvolutionService {
    * Creates a new instance
    */
   static async createInstance(instanceName: string): Promise<unknown> {
-    const response = await fetch(`${this.apiUrl}/instance/create`, {
+    const response = await this.fetchWithTimeout(`${this.apiUrl}/instance/create`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({
@@ -105,14 +125,14 @@ export class EvolutionService {
     }
 
     console.log(`[EvolutionService] Registering webhook url "${webhookUrl}" on instance "${instanceName}"...`);
-    const response = await fetch(`${this.apiUrl}/webhook/set/${instanceName}`, {
+    const response = await this.fetchWithTimeout(`${this.apiUrl}/webhook/set/${instanceName}`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({
         webhook: {
           enabled: true,
           url: webhookUrl,
-          webhookByEvents: false,
+          webhookByEvents: true,
           events: ['MESSAGES_UPSERT'],
         }
       }),
@@ -128,11 +148,38 @@ export class EvolutionService {
   }
 
   /**
+   * Configures low-bandwidth settings for the instance
+   */
+  static async setSettings(instanceName: string = this.defaultInstance): Promise<unknown> {
+    console.log(`[EvolutionService] Configuring low-bandwidth and privacy settings for "${instanceName}"...`);
+    const response = await this.fetchWithTimeout(`${this.apiUrl}/settings/set/${instanceName}`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({
+        rejectCall: false,
+        groupsIgnore: true,
+        alwaysOnline: false,
+        readMessages: false,
+        readStatus: false,
+        syncFullHistory: false,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to set settings: ${response.status} - ${errorText}`);
+    }
+
+    console.log(`[EvolutionService] Settings configured successfully for "${instanceName}".`);
+    return response.json();
+  }
+
+  /**
    * Checks if webhook is configured for the instance and matches the expected URL
    */
   static async isWebhookConfigured(instanceName: string, expectedUrl: string): Promise<boolean> {
     try {
-      const response = await fetch(`${this.apiUrl}/webhook/find/${instanceName}`, {
+      const response = await this.fetchWithTimeout(`${this.apiUrl}/webhook/find/${instanceName}`, {
         method: 'GET',
         headers: this.getHeaders(),
         cache: 'no-store',
@@ -164,7 +211,7 @@ export class EvolutionService {
       return { success: true, message: 'Message logged to console in development environment' };
     }
 
-    const response = await fetch(`${this.apiUrl}/message/sendText/${instanceName}`, {
+    const response = await this.fetchWithTimeout(`${this.apiUrl}/message/sendText/${instanceName}`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({
@@ -185,7 +232,7 @@ export class EvolutionService {
    * Fetches the connection state of the instance
    */
   static async getConnectionState(instanceName: string = this.defaultInstance): Promise<{ instance: { state: string } }> {
-    const response = await fetch(`${this.apiUrl}/instance/connectionState/${instanceName}`, {
+    const response = await this.fetchWithTimeout(`${this.apiUrl}/instance/connectionState/${instanceName}`, {
       method: 'GET',
       headers: this.getHeaders(),
       cache: 'no-store',
@@ -203,7 +250,7 @@ export class EvolutionService {
    * Gets the base64 QR code or pairing code to connect WhatsApp
    */
   static async getConnectQr(instanceName: string = this.defaultInstance): Promise<{ base64?: string; code?: string }> {
-    const response = await fetch(`${this.apiUrl}/instance/connect/${instanceName}`, {
+    const response = await this.fetchWithTimeout(`${this.apiUrl}/instance/connect/${instanceName}`, {
       method: 'GET',
       headers: this.getHeaders(),
       cache: 'no-store',
@@ -221,7 +268,7 @@ export class EvolutionService {
    * Logs out (disconnects) the instance from WhatsApp
    */
   static async logoutInstance(instanceName: string = this.defaultInstance): Promise<unknown> {
-    const response = await fetch(`${this.apiUrl}/instance/logout/${instanceName}`, {
+    const response = await this.fetchWithTimeout(`${this.apiUrl}/instance/logout/${instanceName}`, {
       method: 'DELETE',
       headers: this.getHeaders(),
     });

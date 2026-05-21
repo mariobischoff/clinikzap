@@ -18,7 +18,14 @@ model User {
   appointments           Appointment[]
   workingHours           String[]                @default(["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"])
   weeklyHours            Json?                   // e.g. {"1": ["08:00", "09:00"], ...}
+  duration               Int                     @default(30)
   availabilityExceptions AvailabilityException[]
+  
+  // Custom templates for WhatsApp messages
+  confirmationTemplate   String?
+  cancellationTemplate   String?
+  reminderTemplate       String?
+  reminderHours           Int                     @default(24) // Trigger time for reminders (hours before)
 }
 
 model Customer {
@@ -28,6 +35,7 @@ model Customer {
   userId       String
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   appointments Appointment[]
+  notes        String?       // Internal CRM notes for this patient
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 

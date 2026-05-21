@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { EvolutionService } from '@/services/evolution';
+import { parseTemplate } from '@/utils/template-parser';
 
 // Force Next.js to not cache this route
 export const dynamic = 'force-dynamic';
@@ -16,19 +17,15 @@ export async function GET(req: NextRequest) {
     }
 
     const now = new Date();
-    // Search window: between 23 and 25 hours from now to capture appointments
-    const minDate = new Date(now.getTime() + 23 * 60 * 60 * 1000);
-    const maxDate = new Date(now.getTime() + 25 * 60 * 60 * 1000);
+    console.log(`[Cron Reminders] Checking active appointments at ${now.toISOString()}`);
 
-    console.log(`[Cron Reminders] Checking appointments between ${minDate.toISOString()} and ${maxDate.toISOString()}`);
-
+    // Fetch all confirmed appointments in the future that haven't received a reminder yet
     const appointments = await prisma.appointment.findMany({
       where: {
         status: 'CONFIRMED',
         reminderSent: false,
         appointmentDate: {
-          gte: minDate,
-          lte: maxDate,
+          gte: now,
         },
       },
       include: {
@@ -37,12 +34,27 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    console.log(`[Cron Reminders] Found ${appointments.length} appointments pending notification.`);
+    console.log(`[Cron Reminders] Found ${appointments.length} confirmed future appointments pending reminder check.`);
 
     const results = [];
+    let sentCount = 0;
 
     for (const appointment of appointments) {
       try {
+        const hoursUntilAppointment = (appointment.appointmentDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+        const clinicReminderHours = appointment.user.reminderHours ?? 24;
+
+        // Check if the appointment falls within the notification window for this clinic.
+        // We define the window as: [clinicReminderHours - 1, clinicReminderHours + 1.5]
+        // This ensures that an hourly cron job will reliably trigger once.
+        const minHours = clinicReminderHours - 1.0;
+        const maxHours = clinicReminderHours + 1.5;
+
+        if (hoursUntilAppointment < minHours || hoursUntilAppointment > maxHours) {
+          // Not within the trigger window for this clinic's settings, skip
+          continue;
+        }
+
         const dateStr = appointment.appointmentDate.toLocaleDateString('pt-BR', {
           day: '2-digit',
           month: '2-digit',
@@ -53,7 +65,15 @@ export async function GET(req: NextRequest) {
           minute: '2-digit',
         });
 
-        const reminderMessage = `Olá, *${appointment.customer.name}*!\n\nEste é um lembrete da sua consulta marcada na clínica *${appointment.user.name}* para amanhã, dia *${dateStr}* às *${timeStr}*.\n\nContamos com a sua presença! Se precisar reagendar ou cancelar, entre em contato.`;
+        const template = appointment.user.reminderTemplate || 
+          `Olá, *{nome_paciente}*!\n\nEste é um lembrete da sua consulta marcada na clínica *{nome_clinica}* para o dia *{data_consulta}* às *{hora_consulta}*.\n\nContamos com a sua presença! Se precisar reagendar ou cancelar, entre em contato.`;
+
+        const reminderMessage = parseTemplate(template, {
+          nome_paciente: appointment.customer.name,
+          nome_clinica: appointment.user.name || 'Clínica',
+          data_consulta: dateStr,
+          hora_consulta: timeStr,
+        });
 
         await EvolutionService.sendTextMessage(appointment.customer.phone, reminderMessage);
 
@@ -62,6 +82,7 @@ export async function GET(req: NextRequest) {
           data: { reminderSent: true },
         });
 
+        sentCount++;
         results.push({ id: appointment.id, phone: appointment.customer.phone, status: 'sent' });
         console.log(`[Cron Reminders] Reminder successfully sent to ${appointment.customer.phone} for appointment ${appointment.id}`);
       } catch (sendError: unknown) {
@@ -72,7 +93,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({
-      message: `Processed ${appointments.length} reminders`,
+      message: `Processed ${appointments.length} appointments, sent ${sentCount} reminders`,
       results,
     }, { status: 200 });
   } catch (error: unknown) {
