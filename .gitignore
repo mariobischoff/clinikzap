@@ -40,3 +40,7 @@ upload*.ps1
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Agent & Skills manager
+/.agents/
+/skills-lock.json
