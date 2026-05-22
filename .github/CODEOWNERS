@@ -1,0 +1,25 @@
+# CODEOWNERS — Auto-assignment de revisores
+# Cada linha especifica um padrão de arquivo e os usuários/equipes
+# que são designados como "code owners" para arquivos correspondentes.
+#
+# Documentação: https://docs.github.com/pt/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Proprietário padrão para todos os arquivos no repositório
+* @mariobischoff
+
+# Áreas específicas do projeto
+
+# Configurações do projeto e infraestrutura
+/.github/ @mariobischoff
+/docker-compose.yml @mariobischoff
+/eslint.config.mjs @mariobischoff
+
+# Schema e migrações do banco de dados
+/prisma/ @mariobischoff
+
+# Documentação do projeto
+/*.md @mariobischoff
+/AGENTS.md @mariobischoff
+
+# Testes manuais
+/tests/ @mariobischoff

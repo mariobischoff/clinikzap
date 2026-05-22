@@ -64,31 +64,38 @@ export async function POST(req: NextRequest) {
 
     // 2. Human-Takeover Detection (fromMe)
     if (fromMe) {
-      const silenceKey = `silence:chat:${phone}`;
-      console.log(`[Webhook WhatsApp] Outgoing message from clinic secretary detected. Setting human-takeover bypass lock for ${phone}.`);
-      await redis.set(silenceKey, 'true', 'EX', 3600); // 1 hour TTL
+      try {
+        await redis.set(`silence:chat:${phone}`, 'true', 'EX', 3600);
+      } catch {
+        console.warn('[Webhook WhatsApp] Redis unavailable, skipping silence lock');
+      }
       return NextResponse.json({ message: 'Human-takeover active lock applied' }, { status: 200 });
     }
 
     // 3. Check Silence State
-    const silenceKey = `silence:chat:${phone}`;
-    const isSilenced = await redis.exists(silenceKey);
+    let isSilenced = false;
+    try {
+      isSilenced = !!(await redis.exists(`silence:chat:${phone}`));
+    } catch {
+      console.warn('[Webhook WhatsApp] Redis unavailable, skipping silence check');
+    }
     if (isSilenced) {
       console.log(`[Webhook WhatsApp] Bot response bypassed. Chat with ${phone} is currently silenced due to human takeover.`);
       return NextResponse.json({ message: 'Chat is silenced (human-takeover bypass)' }, { status: 200 });
     }
 
-    // 4. Anti-Flood / Debounce (Rate Limiting)
-    const lockKey = `lock:welcome:${phone}`;
-    const isLocked = await redis.exists(lockKey);
-    if (isLocked) {
+    // 4. Anti-Flood / Debounce (Rate Limiting) — atomic lock via SET NX
+    let lockAcquired = false;
+    try {
+      lockAcquired = !!(await redis.set(`lock:welcome:${phone}`, 'true', 'EX', 900, 'NX'));
+    } catch {
+      console.warn('[Webhook WhatsApp] Redis unavailable, skipping anti-flood lock');
+    }
+    if (!lockAcquired) {
       console.log(`[Webhook WhatsApp] Welcome lock exists for ${phone} (anti-flood check). Ignoring incoming message.`);
       return NextResponse.json({ message: 'Welcome lock active (anti-flood)' }, { status: 200 });
     }
-
-    // 5. Apply Lock
-    console.log(`[Webhook WhatsApp] No locks found. Setting lock:welcome:${phone} with 15 minutes TTL.`);
-    await redis.set(lockKey, 'true', 'EX', 900); // 15 minutes TTL
+    console.log(`[Webhook WhatsApp] Lock acquired: lock:welcome:${phone} with 15 minutes TTL.`);
 
     // 6. Database Validation
     // Fetch the first clinic (User) registered in the system
@@ -145,28 +152,26 @@ export async function POST(req: NextRequest) {
       console.log(`[Webhook WhatsApp] Contextual message sent successfully to ${phone}`);
     } else {
       console.log(`[Webhook WhatsApp] Customer ${customerName} (${phone}) has no active appointments. Triggering WhatsApp onboarding welcome message.`);
-      
-      // Ensure customer exists in database
-      if (!customer) {
-        customer = await prisma.customer.create({
+
+      const { appointment, customer: finalCustomer } = await prisma.$transaction(async (tx) => {
+        const c = customer ?? await tx.customer.create({
+          data: { name: customerName, phone: phone, userId: clinic.id },
+        });
+        const a = await tx.appointment.create({
           data: {
-            name: customerName,
-            phone: phone,
+            customerId: c.id,
             userId: clinic.id,
+            appointmentDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            status: 'PENDING',
           },
         });
-        console.log(`[Webhook WhatsApp] Created new Customer record: ${customerName} (${phone})`);
-      }
-
-      // Create a PENDING appointment to generate the unique token for public scheduling
-      const appointment = await prisma.appointment.create({
-        data: {
-          customerId: customer.id,
-          userId: clinic.id,
-          appointmentDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default placeholder: 7 days from now
-          status: 'PENDING',
-        },
+        return { appointment: a, customer: c };
       });
+
+      if (!customer) {
+        console.log(`[Webhook WhatsApp] Created new Customer record: ${finalCustomer.name} (${phone})`);
+        customer = finalCustomer;
+      }
 
       const scheduleLink = `${appUrl}/schedule/${appointment.token}`;
       const welcomeMessage = `Olá, ${customer.name}! Para realizar o agendamento da sua consulta na clínica *${clinic.name}*, escolha o seu horário clicando no link abaixo:\n\n${scheduleLink}`;

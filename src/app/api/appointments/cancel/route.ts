@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { auth } from '@/auth';
 import { WhatsappService } from '@/services/whatsapp.service';
 import { parseTemplate } from '@/utils/template-parser';
 
@@ -9,6 +10,11 @@ interface CancelRequestBody {
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = (await req.json()) as Partial<CancelRequestBody>;
     const { token } = body;
 
@@ -27,6 +33,10 @@ export async function POST(req: NextRequest) {
 
     if (!appointment) {
       return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
+    }
+
+    if (appointment.userId !== session.user.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Verify if it exists and its current status is 'PENDING' or 'CONFIRMED'

@@ -61,6 +61,9 @@ model Appointment {
   reminderSent    Boolean           @default(false)          // To avoid duplicate notifications
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([userId, status, appointmentDate])
+  @@index([status, reminderSent, appointmentDate])
 }
 
 model AvailabilityException {

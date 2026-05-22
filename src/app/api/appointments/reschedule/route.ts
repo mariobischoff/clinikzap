@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { auth } from '@/auth';
 import { WhatsappService } from '@/services/whatsapp.service';
 import { parseTemplate } from '@/utils/template-parser';
 
@@ -9,12 +10,9 @@ interface RescheduleRequestBody {
 
 export async function POST(req: NextRequest) {
   try {
-    // Mock-verify that the clinic's user session is active
-    console.log('[Appointment Reschedule] Mock-verifying clinic user session: ACTIVE');
-    const isSessionActive = true; // Simulated session check
-
-    if (!isSessionActive) {
-      return NextResponse.json({ error: 'Unauthorized: Session is inactive' }, { status: 401 });
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = (await req.json()) as Partial<RescheduleRequestBody>;
@@ -35,6 +33,10 @@ export async function POST(req: NextRequest) {
 
     if (!originalAppointment) {
       return NextResponse.json({ error: 'Original appointment not found' }, { status: 404 });
+    }
+
+    if (originalAppointment.userId !== session.user.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Verify it is not already canceled

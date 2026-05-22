@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "📧 Suporte & Dúvidas"
+    url: https://github.com/mariobischoff/clinikzap/discussions
+    about: "Tem dúvidas sobre o projeto ou precisa de ajuda? Use a aba de Discussões."
+  - name: "💬 WhatsApp do Projeto"
+    url: https://wa.me/5511999999999
+    about: "Entre em contato direto com a equipe via WhatsApp."
+  - name: "📄 Documentação"
+    url: https://github.com/mariobischoff/clinikzap#readme
+    about: "Consulte a documentação do projeto antes de abrir uma issue."

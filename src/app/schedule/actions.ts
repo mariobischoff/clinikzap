@@ -182,10 +182,11 @@ export async function confirmAppointment(
     const finalDate = new Date(dateStr);
     finalDate.setHours(hours, minutes, 0, 0);
 
-    // Update appointment status and customer's name if modified
-    await prisma.$transaction([
-      prisma.appointment.update({
-        where: { id: appointment.id },
+    // Update appointment status (CAS: only if still PENDING) and customer name
+    // If another request already changed the status, updateMany returns count=0
+    const [{ count: updatedCount }] = await prisma.$transaction([
+      prisma.appointment.updateMany({
+        where: { id: appointment.id, status: 'PENDING' },
         data: {
           appointmentDate: finalDate,
           status: 'CONFIRMED',
@@ -198,6 +199,10 @@ export async function confirmAppointment(
         },
       }),
     ]);
+
+    if (updatedCount === 0) {
+      return { success: false, error: 'Este agendamento já foi finalizado ou cancelado.' };
+    }
 
     // Send confirmation message to the patient
     const dateFormatted = finalDate.toLocaleDateString('pt-BR', {
