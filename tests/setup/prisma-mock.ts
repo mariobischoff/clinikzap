@@ -3,8 +3,9 @@ import { vi } from 'vitest';
 const models = ['user', 'customer', 'appointment', 'availabilityException', 'account', 'session', 'verificationToken'];
 
 function createPrismaMock() {
-  const mock: any = {
-    $transaction: vi.fn((arg: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- prisma client mock needs dynamic model access
+  const mock: Record<string, any> = {
+    $transaction: vi.fn((arg: unknown) => {
       if (Array.isArray(arg)) {
         return Promise.all(arg);
       }

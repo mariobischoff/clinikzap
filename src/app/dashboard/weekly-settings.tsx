@@ -3,6 +3,9 @@
 import { useState, useTransition } from 'react';
 import { updateWeeklyHours, updateClinicDuration } from './actions';
 import { Check, Save, Calendar, Clock } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface WeeklySettingsProps {
   initialWeeklyHours: Record<string, string[]>;
@@ -125,16 +128,20 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <select
-            value={duration}
+          <Select
+            value={String(duration)}
             disabled={isUpdatingDuration}
-            onChange={(e) => handleDurationChange(Number(e.target.value))}
-            className="glass-input rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-teal-500/50 transition-all cursor-pointer [color-scheme:dark]"
+            onValueChange={(val) => handleDurationChange(Number(val))}
           >
-            <option value={30}>30 minutos</option>
-            <option value={45}>45 minutos</option>
-            <option value={60}>1 hora (60 min)</option>
-          </select>
+            <SelectTrigger className="w-[180px] bg-slate-950/40 border-white/5 text-slate-200 font-semibold cursor-pointer">
+              <SelectValue placeholder="Selecione a duração" />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-950 border border-white/10 text-slate-200">
+              <SelectItem value="30">30 minutos</SelectItem>
+              <SelectItem value="45">45 minutos</SelectItem>
+              <SelectItem value="60">1 hora (60 min)</SelectItem>
+            </SelectContent>
+          </Select>
           {isUpdatingDuration && <div className="w-4 h-4 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />}
         </div>
       </div>
@@ -151,30 +158,33 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
               const slotCount = (weeklyHours[day.index] || []).length;
 
               return (
-                <button
+                <Button
                   key={day.index}
                   type="button"
+                  variant="outline"
                   onClick={() => setSelectedDay(day.index)}
-                  className={`w-full text-left px-4 py-3 rounded-2xl flex items-center justify-between border text-sm font-semibold transition-all cursor-pointer ${
+                  className={cn(
+                    "w-full h-auto py-3 px-4 rounded-2xl flex items-center justify-between border text-sm font-semibold transition-all cursor-pointer",
                     isActive
-                      ? 'bg-teal-500/10 border-teal-500/30 text-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.05)]'
-                      : 'bg-slate-950/40 border-white/5 text-slate-400 hover:bg-slate-900/40 hover:text-slate-200'
-                  }`}
+                      ? "bg-teal-500/10 border-teal-500/30 text-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.05)] hover:bg-teal-500/15 hover:text-teal-400"
+                      : "bg-slate-950/40 border-white/5 text-slate-400 hover:bg-slate-900/40 hover:text-slate-200"
+                  )}
                 >
                   <span className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 shrink-0" />
                     {day.name}
                   </span>
                   <span
-                    className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
+                    className={cn(
+                      "text-[11px] px-2 py-0.5 rounded-full font-bold",
                       slotCount > 0
-                        ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
-                        : 'bg-slate-900 text-slate-500 border border-slate-800'
-                    }`}
+                        ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
+                        : "bg-slate-900 text-slate-500 border border-slate-800"
+                    )}
                   >
                     {slotCount} horários
                   </span>
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -193,20 +203,24 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
             </div>
             
             <div className="flex gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={handleSelectAllForDay}
-                className="px-3 py-1.5 bg-slate-950/40 hover:bg-slate-900/40 border border-white/5 text-slate-400 hover:text-slate-200 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                className="bg-slate-950/40 hover:bg-slate-900/40 border border-white/5 text-slate-400 hover:text-slate-200 text-xs font-semibold rounded-xl cursor-pointer"
               >
                 Selecionar Todos
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={handleClearAllForDay}
-                className="px-3 py-1.5 bg-slate-950/40 hover:bg-slate-900/40 border border-white/5 text-slate-400 hover:text-slate-200 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                className="bg-slate-950/40 hover:bg-slate-900/40 border border-white/5 text-slate-400 hover:text-slate-200 text-xs font-semibold rounded-xl cursor-pointer"
               >
                 Limpar Todos
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -215,15 +229,17 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
             {allPossibleSlots.map((slot) => {
               const isSelected = currentDaySlots.includes(slot);
               return (
-                <button
+                <Button
                   key={slot}
                   type="button"
+                  variant="outline"
                   onClick={() => handleToggleSlot(slot)}
-                  className={`p-3.5 rounded-2xl border text-sm font-semibold transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+                  className={cn(
+                    "h-auto p-3.5 rounded-2xl border text-sm font-semibold transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-1.5",
                     isSelected
-                      ? 'bg-teal-500/10 border-teal-500/40 text-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.08)]'
-                      : 'bg-slate-950/40 border-white/5 hover:border-white/10 text-slate-500 hover:text-slate-400'
-                  }`}
+                      ? "bg-teal-500/10 border-teal-500/40 text-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.08)] hover:bg-teal-500/15 hover:text-teal-400"
+                      : "bg-slate-950/40 border-white/5 hover:border-white/10 text-slate-500 hover:text-slate-400"
+                  )}
                 >
                   <span>{slot}</span>
                   {isSelected ? (
@@ -233,7 +249,7 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
                   ) : (
                     <span className="w-3.5 h-3.5" />
                   )}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -244,24 +260,25 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
         <div>
           {message && (
             <p
-              className={`text-sm font-semibold ${
+              className={cn(
+                "text-sm font-semibold",
                 message.type === 'success' ? 'text-teal-400' : 'text-red-400'
-              }`}
+              )}
             >
               {message.text}
             </p>
           )}
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-2xl text-sm font-bold transition-all shadow-lg hover:shadow-teal-500/10 disabled:opacity-50 cursor-pointer"
+          className="w-full sm:w-auto h-12 flex items-center justify-center gap-2 px-6 bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-2xl text-sm font-bold transition-all shadow-lg hover:shadow-teal-500/10 disabled:opacity-50 cursor-pointer"
         >
           <Save className="w-4 h-4" />
           {isPending ? 'Salvando...' : 'Salvar Agenda Semanal'}
-        </button>
+        </Button>
       </div>
     </div>
   );

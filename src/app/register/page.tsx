@@ -1,49 +1,17 @@
-import prisma from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useActionState } from 'react';
 import Link from 'next/link';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, Loader2 } from 'lucide-react';
+import { handleRegister } from './actions';
 
-// We can define the server action inside the file or in a separate actions file.
-// Since it's a small helper page, a server action defined inside the same file (or as a separate action) is easy.
-// Let's create a server action in a separate file or directly here since this is a server page.
-// Wait, in Next.js, 'use server' at the top of a page file makes all exports server actions, but usually we define actions in a separate file or use a Client Component for form submission.
-// Let's make this page a Client Component that calls a Server Action, or a Server Component with a form action!
-// In Next.js, form actions can be server functions! This is extremely neat because it works without any client-side JavaScript.
-// Let's implement the Server Component with a Server Action as the form action.
+export default function RegisterPage() {
+  const [state, formAction, isPending] = useActionState(handleRegister, { error: null });
 
-async function handleRegister(formData: FormData) {
-  'use server';
-
-  const name = formData.get('name') as string;
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-
-  if (!name || !email || !password) {
-    throw new Error('Todos os campos são obrigatórios');
-  }
-
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (existingUser) {
-    throw new Error('Email já cadastrado');
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-    },
-  });
-
-  redirect('/login');
-}
-
-export default async function RegisterPage() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-[#030712] text-slate-100 p-4 relative overflow-hidden">
       {/* Background Decorative Gradients */}
@@ -52,74 +20,91 @@ export default async function RegisterPage() {
         <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '3s' }} />
       </div>
 
-      <div className="relative w-full max-w-md glass-panel rounded-3xl p-8 shadow-2xl z-10">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">
+      <Card className="relative w-full max-w-md glass-panel rounded-3xl p-8 shadow-2xl z-10 border-none bg-transparent">
+        <CardHeader className="text-center mb-8 p-0">
+          <CardTitle className="text-3xl font-bold tracking-tight bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">
             ClinikZap
-          </h1>
-          <p className="text-slate-400 mt-2 text-sm">
+          </CardTitle>
+          <CardDescription className="text-slate-400 mt-2 text-sm">
             Crie sua conta administrativa para gerenciar sua clínica
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          {state.error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-start gap-3 text-sm">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <span>{state.error}</span>
+            </div>
+          )}
+
+          <form action={formAction} className="space-y-6">
+            <div>
+              <Label htmlFor="name" className="block text-sm font-medium text-slate-350 mb-2">
+                Nome da Clínica / Profissional
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                required
+                className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
+                placeholder="Ex: Clinica OdontoLife"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="email" className="block text-sm font-medium text-slate-350 mb-2">
+                Endereço de E-mail
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                required
+                className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
+                placeholder="clinica@exemplo.com"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="password" className="block text-sm font-medium text-slate-355 mb-2">
+                Senha de Acesso
+              </Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Cadastrando...
+                </>
+              ) : (
+                'Cadastrar Clínica'
+              )}
+            </Button>
+          </form>
+
+          <p className="text-center text-sm text-slate-400 mt-6">
+            Já possui conta?{' '}
+            <Link href="/login" className="text-teal-400 hover:underline font-medium">
+              Entrar
+            </Link>
           </p>
-        </div>
-
-        <form action={handleRegister} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-slate-350 mb-2">
-              Nome da Clínica / Profissional
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
-              placeholder="Ex: Clinica OdontoLife"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-350 mb-2">
-              Endereço de E-mail
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
-              placeholder="clinica@exemplo.com"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-355 mb-2">
-              Senha de Acesso
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-          >
-            Cadastrar Clínica
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-slate-400 mt-6">
-          Já possui conta?{' '}
-          <Link href="/login" className="text-teal-400 hover:underline font-medium">
-            Entrar
-          </Link>
-        </p>
-      </div>
+        </CardContent>
+      </Card>
     </main>
   );
 }

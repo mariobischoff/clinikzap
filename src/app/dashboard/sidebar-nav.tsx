@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Calendar, MessageSquare, Users } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
 
 export default function SidebarNav() {
   const pathname = usePathname();
@@ -42,11 +44,13 @@ export default function SidebarNav() {
           <Link
             key={link.href}
             href={link.href}
-            className={`flex items-center gap-3 px-4 py-3 rounded-2xl border text-sm font-semibold transition-all ${
+            className={cn(
+              buttonVariants({ variant: 'ghost' }),
+              'flex items-center gap-3 px-4 py-3 rounded-2xl border text-sm font-semibold transition-all h-auto justify-start',
               isActive
                 ? 'bg-slate-800/50 border-slate-800 text-teal-400 font-semibold'
                 : 'hover:bg-slate-800/30 text-slate-400 hover:text-slate-200 border-transparent'
-            }`}
+            )}
           >
             <Icon className="w-4 h-4" />
             {link.label}

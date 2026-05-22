@@ -247,6 +247,35 @@ export class EvolutionService {
   }
 
   /**
+   * Fetches all instances and finds the instance name matching the given instanceId (UUID)
+   */
+  static async getInstanceNameById(instanceId: string): Promise<string | null> {
+    try {
+      const response = await this.fetchWithTimeout(`${this.apiUrl}/instance/fetchInstances`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        console.error(`[EvolutionService] Failed to fetch instances: ${response.statusText}`);
+        return null;
+      }
+
+      const data = await response.json();
+      const instances = Array.isArray(data) ? data : [];
+      const match = instances.find(
+        (inst: { id?: string; name?: string; instanceName?: string }) =>
+          inst.id === instanceId
+      );
+      return match?.name || match?.instanceName || null;
+    } catch (error) {
+      console.error(`[EvolutionService] Error fetching instance name for ID ${instanceId}:`, error);
+      return null;
+    }
+  }
+
+  /**
    * Gets the base64 QR code or pairing code to connect WhatsApp
    */
   static async getConnectQr(instanceName: string = this.defaultInstance): Promise<{ base64?: string; code?: string }> {

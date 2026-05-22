@@ -25,11 +25,6 @@ const mockAppointment = {
   },
 };
 
-const updatedAppointment = {
-  ...mockAppointment,
-  appointmentDate: new Date('2026-06-15T14:00:00Z'),
-  status: 'CONFIRMED' as const,
-};
 
 describe('getAppointmentByToken', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -123,7 +118,7 @@ describe('confirmAppointment', () => {
 
   it('deve confirmar mesmo se Evolution falhar (fallback)', async () => {
     const { EvolutionService } = await import('@/services/evolution');
-    (EvolutionService.sendTextMessage as any).mockRejectedValue(new Error('API down'));
+    vi.mocked(EvolutionService.sendTextMessage).mockRejectedValue(new Error('API down'));
 
     prismaMock.appointment.findUnique.mockResolvedValue(mockAppointment);
     prismaMock.appointment.updateMany.mockResolvedValue({ count: 1 });

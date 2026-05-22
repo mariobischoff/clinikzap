@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import redis from '@/lib/redis';
 import { EvolutionService } from '@/services/evolution';
+import { normalizePhone } from '@/utils/phone';
 
 // Strict TypeScript interfaces for the Evolution API webhook payload
 interface EvolutionMessageKey {
@@ -24,7 +25,8 @@ interface EvolutionMessageData {
 
 interface EvolutionWebhookBody {
   event: string;
-  instanceId: string;
+  instanceId?: string;
+  instance?: string;
   data: EvolutionMessageData;
 }
 
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Extract phone number from JID (e.g. "5511999999999@s.whatsapp.net" -> "5511999999999")
-    const phone = remoteJid.split('@')[0];
+    const phone = normalizePhone(remoteJid.split('@')[0]);
     if (!phone) {
       console.error(`[Webhook WhatsApp] Could not parse phone number from remoteJid: ${remoteJid}`);
       return NextResponse.json({ message: 'Invalid phone number format' }, { status: 200 });
@@ -97,12 +99,25 @@ export async function POST(req: NextRequest) {
     }
     console.log(`[Webhook WhatsApp] Lock acquired: lock:welcome:${phone} with 15 minutes TTL.`);
 
-    // 6. Database Validation
-    // Fetch the first clinic (User) registered in the system
-    const clinic = await prisma.user.findFirst();
-    if (!clinic) {
+    // 6. Multi-tenant: find clinic by Evolution instance
+    const instanceNameFromApi = body.instanceId
+      ? await EvolutionService.getInstanceNameById(body.instanceId)
+      : body.instance || null;
+
+    const clinic = instanceNameFromApi
+      ? await prisma.user.findUnique({ where: { evolutionInstanceName: instanceNameFromApi } })
+      : null;
+
+    // Fall back to the first clinic (backward compatible with single-tenant setups)
+    const resolvedClinic = clinic ?? await prisma.user.findFirst();
+
+    if (!resolvedClinic) {
       console.warn('[Webhook WhatsApp] No clinic User found in the database. Cannot process scheduling.');
       return NextResponse.json({ error: 'No clinic registered yet' }, { status: 200 });
+    }
+
+    if (!clinic && instanceNameFromApi) {
+      console.warn(`[Webhook WhatsApp] Instance "${instanceNameFromApi}" not mapped to any clinic.`);
     }
 
     const customerName = data.pushName || 'Paciente';
@@ -112,7 +127,7 @@ export async function POST(req: NextRequest) {
       where: {
         phone_userId: {
           phone: phone,
-          userId: clinic.id,
+          userId: resolvedClinic.id,
         },
       },
     });
@@ -122,7 +137,7 @@ export async function POST(req: NextRequest) {
       ? await prisma.appointment.findFirst({
           where: {
             customerId: customer.id,
-            userId: clinic.id,
+            userId: resolvedClinic.id,
             status: {
               in: ['PENDING', 'CONFIRMED'],
             },
@@ -155,12 +170,12 @@ export async function POST(req: NextRequest) {
 
       const { appointment, customer: finalCustomer } = await prisma.$transaction(async (tx) => {
         const c = customer ?? await tx.customer.create({
-          data: { name: customerName, phone: phone, userId: clinic.id },
+          data: { name: customerName, phone: phone, userId: resolvedClinic.id },
         });
         const a = await tx.appointment.create({
           data: {
             customerId: c.id,
-            userId: clinic.id,
+            userId: resolvedClinic.id,
             appointmentDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             status: 'PENDING',
           },
@@ -174,7 +189,7 @@ export async function POST(req: NextRequest) {
       }
 
       const scheduleLink = `${appUrl}/schedule/${appointment.token}`;
-      const welcomeMessage = `Olá, ${customer.name}! Para realizar o agendamento da sua consulta na clínica *${clinic.name}*, escolha o seu horário clicando no link abaixo:\n\n${scheduleLink}`;
+      const welcomeMessage = `Olá, ${customer.name}! Para realizar o agendamento da sua consulta na clínica *${resolvedClinic.name}*, escolha o seu horário clicando no link abaixo:\n\n${scheduleLink}`;
 
       await EvolutionService.sendTextMessage(phone, welcomeMessage);
       console.log(`[Webhook WhatsApp] Onboarding scheduling link sent successfully to ${phone}`);

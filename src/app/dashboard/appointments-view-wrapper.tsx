@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { List, Calendar as CalendarIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import AppointmentsTable from './appointments-table';
 import AppointmentsCalendar from './appointments-calendar';
 
@@ -16,7 +18,7 @@ interface Appointment {
   customerId: string;
   userId: string;
   appointmentDate: Date | string | null;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELED';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELED' | 'COMPLETED' | 'NOSHOW';
   token: string;
   reminderSent: boolean;
   createdAt: Date | string;
@@ -38,30 +40,34 @@ export default function AppointmentsViewWrapper({
       {/* View switcher control at the top right of the section */}
       <div className="flex justify-end">
         <div className="flex bg-slate-950/40 backdrop-blur-md p-1 rounded-2xl border border-white/5 shadow-inner">
-          <button
+          <Button
+            variant="ghost"
             type="button"
             onClick={() => setViewMode('list')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            className={cn(
+              'flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer h-auto hover:bg-transparent',
               viewMode === 'list'
-                ? 'bg-teal-500 text-slate-950 font-bold shadow-md'
+                ? 'bg-teal-500 text-slate-950 font-bold shadow-md hover:bg-teal-400 hover:text-slate-950'
                 : 'text-slate-400 hover:text-slate-200'
-            }`}
+            )}
           >
             <List className="w-3.5 h-3.5" />
             Tabela
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
             type="button"
             onClick={() => setViewMode('calendar')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            className={cn(
+              'flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer h-auto hover:bg-transparent',
               viewMode === 'calendar'
-                ? 'bg-teal-500 text-slate-950 font-bold shadow-md'
+                ? 'bg-teal-500 text-slate-950 font-bold shadow-md hover:bg-teal-400 hover:text-slate-950'
                 : 'text-slate-400 hover:text-slate-200'
-            }`}
+            )}
           >
             <CalendarIcon className="w-3.5 h-3.5" />
             Calendário
-          </button>
+          </Button>
         </div>
       </div>
 

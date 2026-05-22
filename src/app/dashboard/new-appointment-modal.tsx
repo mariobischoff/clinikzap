@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, User, Phone, Loader2, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import { searchCustomers, createManualAppointment, getAdminAvailableSlots } from './actions';
 import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 interface NewAppointmentModalProps {
   isOpen: boolean;
@@ -252,13 +255,14 @@ export default function NewAppointmentModal({
                 <Sparkles className="w-5 h-5 text-teal-400" />
                 <h2 className="text-xl font-bold text-slate-100">Novo Agendamento</h2>
               </div>
-              <button
+              <Button
+                variant="ghost"
                 type="button"
                 onClick={handleClose}
-                className="p-1.5 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                className="p-1.5 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-200 transition-colors cursor-pointer h-auto w-auto border-none"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
 
             {/* Scrollable Form Body */}
@@ -279,11 +283,11 @@ export default function NewAppointmentModal({
 
               {/* Patient Name Search / Autocomplete */}
               <div className="space-y-2 relative" ref={suggestionsRef}>
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" /> Nome do Paciente
-                </label>
+                </Label>
                 <div className="relative">
-                  <input
+                  <Input
                     type="text"
                     required
                     value={customerName}
@@ -309,18 +313,19 @@ export default function NewAppointmentModal({
                       className="absolute left-0 right-0 top-full mt-1.5 bg-slate-950/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-20 max-h-48 overflow-y-auto divide-y divide-white/5"
                     >
                       {suggestions.map((cust) => (
-                        <button
+                        <Button
                           key={cust.id}
+                          variant="ghost"
                           type="button"
                           onClick={() => handleSelectSuggestion(cust)}
-                          className="w-full text-left px-4 py-3 hover:bg-slate-900/60 transition-colors flex items-center justify-between text-sm cursor-pointer"
+                          className="w-full text-left px-4 py-3 hover:bg-slate-900/60 transition-colors flex items-center justify-between text-sm cursor-pointer rounded-none h-auto border-none"
                         >
                           <span className="font-medium text-slate-200">{cust.name}</span>
                           <span className="text-xs text-slate-500 flex items-center gap-1 font-mono">
-                            <Phone className="w-3 h-3" />
+                            <Phone className="w-3.5 h-3.5" />
                             {cust.phone}
                           </span>
-                        </button>
+                        </Button>
                       ))}
                     </motion.div>
                   )}
@@ -329,10 +334,10 @@ export default function NewAppointmentModal({
 
               {/* WhatsApp Phone */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Phone className="w-3.5 h-3.5" /> WhatsApp (com DDD)
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   required
                   value={customerPhone}
@@ -347,10 +352,10 @@ export default function NewAppointmentModal({
 
               {/* Grid Date & Time Slots */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5" /> Data da Consulta
-                </label>
-                <input
+                </Label>
+                <Input
                   type="date"
                   required
                   min={getMinDateStr()}
@@ -362,9 +367,9 @@ export default function NewAppointmentModal({
 
               {/* Time Slots Section */}
               <div className="space-y-3 pt-2">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5" /> Horários Disponíveis
-                </label>
+                </Label>
 
                 {isLoadingSlots ? (
                   <div className="grid grid-cols-4 gap-2">
@@ -386,18 +391,19 @@ export default function NewAppointmentModal({
                     {slots.map((s) => {
                       const isSelected = time === s;
                       return (
-                        <button
+                        <Button
+                          variant="outline"
                           key={s}
                           type="button"
                           onClick={() => setTime(s)}
-                          className={`py-2 px-1 rounded-xl text-xs font-semibold font-mono border transition-all cursor-pointer text-center ${
+                          className={`py-2 px-1 rounded-xl text-xs font-semibold font-mono border transition-all cursor-pointer text-center h-auto ${
                             isSelected
-                              ? 'bg-teal-500 text-slate-950 border-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.25)] font-bold'
+                              ? 'bg-teal-500 text-slate-950 border-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.25)] font-bold hover:bg-teal-400 hover:text-slate-950'
                               : 'bg-slate-950/40 border-white/5 text-slate-350 hover:border-white/10 hover:text-slate-200'
                           }`}
                         >
                           {s}
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -406,18 +412,19 @@ export default function NewAppointmentModal({
 
               {/* Submit Buttons */}
               <div className="flex gap-3 pt-4 border-t border-white/5 mt-2">
-                <button
+                <Button
+                  variant="outline"
                   type="button"
                   onClick={handleClose}
                   disabled={isPending}
-                  className="flex-1 py-3 px-4 bg-slate-950/40 hover:bg-slate-900/40 border border-white/5 text-slate-300 rounded-2xl text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+                  className="flex-1 py-3 px-4 bg-slate-950/40 hover:bg-slate-900/40 border border-white/5 text-slate-300 rounded-2xl text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 h-auto"
                 >
                   Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={isPending || isLoadingSlots || !time}
-                  className="flex-1 py-3 px-4 bg-teal-500 hover:bg-teal-400 disabled:bg-slate-800 text-slate-950 disabled:text-slate-650 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
+                  className="flex-1 py-3 px-4 bg-teal-500 hover:bg-teal-400 disabled:bg-slate-800 text-slate-950 disabled:text-slate-650 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg disabled:shadow-none border-none h-auto"
                 >
                   {isPending ? (
                     <>
@@ -427,7 +434,7 @@ export default function NewAppointmentModal({
                   ) : (
                     'Confirmar Agendamento'
                   )}
-                </button>
+                </Button>
               </div>
             </form>
           </motion.div>

@@ -6,7 +6,7 @@ import { TrendingUp, CheckCircle2 } from 'lucide-react';
 interface Appointment {
   id: string;
   appointmentDate: string | Date | null;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELED';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELED' | 'COMPLETED' | 'NOSHOW';
 }
 
 interface AnalyticsPanelProps {
@@ -20,15 +20,21 @@ export default function AnalyticsPanel({ appointments }: AnalyticsPanelProps) {
     const confirmed = appointments.filter((a) => a.status === 'CONFIRMED').length;
     const pending = appointments.filter((a) => a.status === 'PENDING').length;
     const canceled = appointments.filter((a) => a.status === 'CANCELED').length;
+    const completed = appointments.filter((a) => a.status === 'COMPLETED').length;
+    const noshow = appointments.filter((a) => a.status === 'NOSHOW').length;
 
     return {
       total,
       confirmed,
       pending,
       canceled,
+      completed,
+      noshow,
       confirmedPct: total > 0 ? Math.round((confirmed / total) * 100) : 0,
       pendingPct: total > 0 ? Math.round((pending / total) * 100) : 0,
       canceledPct: total > 0 ? Math.round((canceled / total) * 100) : 0,
+      completedPct: total > 0 ? Math.round((completed / total) * 100) : 0,
+      noshowPct: total > 0 ? Math.round((noshow / total) * 100) : 0,
     };
   }, [appointments]);
 
@@ -60,9 +66,11 @@ export default function AnalyticsPanel({ appointments }: AnalyticsPanelProps) {
   // 3. SVG Donut Chart Coordinates
   const donutData = useMemo(() => {
     const data = [
-      { label: 'Confirmados', value: stats.confirmed, color: '#14b8a6' }, // Teal 500
-      { label: 'Pendentes', value: stats.pending, color: '#6366f1' },    // Indigo 500
-      { label: 'Cancelados', value: stats.canceled, color: '#ef4444' },   // Red 500
+      { label: 'Confirmados', value: stats.confirmed, color: '#14b8a6' },
+      { label: 'Pendentes', value: stats.pending, color: '#6366f1' },
+      { label: 'Compareceram', value: stats.completed, color: '#10b981' },
+      { label: 'Não Compareceram', value: stats.noshow, color: '#f97316' },
+      { label: 'Cancelados', value: stats.canceled, color: '#ef4444' },
     ];
 
     const totalValue = data.reduce((sum, item) => sum + item.value, 0) || 1;

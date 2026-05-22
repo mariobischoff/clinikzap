@@ -21,6 +21,9 @@ import {
 import NewAppointmentModal from './new-appointment-modal';
 import { toast } from 'sonner';
 import ConfirmationModal from '@/components/confirmation-modal';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface Customer {
   id: string;
@@ -33,7 +36,7 @@ interface Appointment {
   customerId: string;
   userId: string;
   appointmentDate: Date | string | null;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELED';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELED' | 'COMPLETED' | 'NOSHOW';
   token: string;
   reminderSent: boolean;
   createdAt: Date | string;
@@ -286,27 +289,33 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
         {/* Date Display and Navigation */}
         <div className="flex items-center gap-3">
           <div className="flex items-center bg-slate-950/40 border border-white/5 backdrop-blur-md rounded-2xl p-1">
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-xs"
               onClick={handlePrev}
-              className="p-2 hover:bg-slate-900 rounded-xl text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+              className="text-slate-400 hover:text-slate-200 hover:bg-slate-900 rounded-xl cursor-pointer border-0"
             >
               <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={handleToday}
-              className="px-3 py-1 hover:bg-slate-900 rounded-xl text-xs font-semibold text-slate-300 transition-colors cursor-pointer"
+              className="px-3 hover:bg-slate-900 rounded-xl text-xs font-semibold text-slate-300 cursor-pointer border-0"
             >
               Hoje
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-xs"
               onClick={handleNext}
-              className="p-2 hover:bg-slate-900 rounded-xl text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+              className="text-slate-400 hover:text-slate-200 hover:bg-slate-900 rounded-xl cursor-pointer border-0"
             >
               <ChevronRight className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
 
           <h2 className="text-lg font-bold text-slate-100 font-sans">
@@ -329,43 +338,47 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
         {/* View Mode Switcher and Create Button */}
         <div className="flex items-center gap-3 self-start sm:self-auto">
           {/* Mês / Semana Toggles */}
-          <div className="flex bg-slate-950/40 backdrop-blur-md border border-white/5 p-1 rounded-2xl">
-            <button
+          <div className="flex bg-slate-950/40 backdrop-blur-md border border-white/5 p-1 rounded-2xl gap-1">
+            <Button
               type="button"
+              variant={viewMode === 'month' ? "default" : "ghost"}
               onClick={() => setViewMode('month')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={cn(
+                "px-4 py-1.5 h-7 rounded-xl text-xs font-semibold cursor-pointer border-0",
                 viewMode === 'month'
-                  ? 'bg-teal-500 text-slate-950 font-bold shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
+                  ? 'bg-teal-500 text-slate-950 font-bold shadow-md hover:bg-teal-400 hover:text-slate-950'
+                  : 'text-slate-400 hover:text-slate-250 hover:bg-slate-900/30'
+              )}
             >
               Mês
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant={viewMode === 'week' ? "default" : "ghost"}
               onClick={() => setViewMode('week')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={cn(
+                "px-4 py-1.5 h-7 rounded-xl text-xs font-semibold cursor-pointer border-0",
                 viewMode === 'week'
-                  ? 'bg-teal-500 text-slate-950 font-bold shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
+                  ? 'bg-teal-500 text-slate-950 font-bold shadow-md hover:bg-teal-400 hover:text-slate-950'
+                  : 'text-slate-400 hover:text-slate-250 hover:bg-slate-900/30'
+              )}
             >
               Semana
-            </button>
+            </Button>
           </div>
 
           {/* Quick Create Button */}
-          <button
+          <Button
             type="button"
             onClick={() => {
               setDefaultDateForModal('');
               setIsNewModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-2xl text-xs transition-all cursor-pointer shadow-md shadow-teal-500/10 active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2 h-8 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-2xl text-xs cursor-pointer shadow-md shadow-teal-500/10 active:scale-95 border-0"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             Novo
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -392,20 +405,23 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
               return (
                 <div
                   key={idx}
-                  className={`min-h-[110px] p-2 flex flex-col group relative transition-colors ${
+                  className={cn(
+                    "min-h-[110px] p-2 flex flex-col group relative transition-colors hover:bg-slate-900/30",
                     isCurrentMonth ? 'bg-slate-900/10' : 'bg-slate-950/10 text-slate-600'
-                  } hover:bg-slate-900/30`}
+                  )}
                 >
                   {/* Day number & Quick Add */}
                   <div className="flex justify-between items-center mb-1">
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon-xs"
                       onClick={() => handleOpenNewWithDate(day)}
-                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-800 rounded-lg text-teal-400 transition-all cursor-pointer"
+                      className="opacity-0 group-hover:opacity-100 hover:bg-slate-800 rounded-lg text-teal-400 transition-all cursor-pointer border-0"
                       title="Agendar neste dia"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                    </button>
+                    </Button>
                     <span
                       className={`text-xs font-bold font-mono w-5 h-5 rounded-full flex items-center justify-center ${
                         isCurrentDay
@@ -432,34 +448,43 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                         statusStyle = 'bg-teal-500/10 border-teal-500/20 text-teal-400';
                       } else if (app.status === 'PENDING') {
                         statusStyle = 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400';
+                      } else if (app.status === 'COMPLETED') {
+                        statusStyle = 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 line-through';
+                      } else if (app.status === 'NOSHOW') {
+                        statusStyle = 'bg-orange-500/10 border-orange-500/20 text-orange-400 line-through';
                       } else {
                         statusStyle = 'bg-red-500/10 border-red-500/20 text-red-400 line-through';
                       }
 
                       return (
-                        <button
+                        <Button
                           key={app.id}
                           type="button"
+                          variant="outline"
                           onClick={() => setSelectedApp(app)}
-                          className={`w-full text-left px-1.5 py-0.5 rounded-lg text-[10px] font-medium border truncate block transition-all cursor-pointer hover:brightness-125 ${statusStyle}`}
+                          className={cn(
+                            "w-full justify-start h-auto px-1.5 py-0.5 rounded-lg text-[10px] font-medium border truncate block transition-all cursor-pointer hover:brightness-125",
+                            statusStyle
+                          )}
                         >
                           <span className="font-bold mr-1">{timeStr}</span>
                           {app.customer.name}
-                        </button>
+                        </Button>
                       );
                     })}
 
                     {dayApps.length > 3 && (
-                      <button
+                      <Button
                         type="button"
+                        variant="outline"
                         onClick={() => {
                           setCurrentDate(day);
                           setViewMode('week');
                         }}
-                        className="w-full text-center py-0.5 text-[10px] text-teal-400 hover:text-teal-350 font-bold block bg-slate-950/40 border border-white/5 rounded-lg hover:border-white/10 cursor-pointer"
+                        className="w-full h-auto py-0.5 text-[10px] text-teal-400 hover:text-teal-350 font-bold block bg-slate-950/40 border border-white/5 rounded-lg hover:border-white/10 cursor-pointer"
                       >
                         + {dayApps.length - 3} mais
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -530,14 +555,16 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                         className="p-1 border-r border-white/5 hover:bg-slate-900/10 transition-colors relative group flex flex-col gap-1 justify-start"
                       >
                         {/* Quick Add Button on hover */}
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="icon-xs"
                           onClick={() => handleOpenNewWithDate(day)}
-                          className="opacity-0 group-hover:opacity-100 absolute right-1.5 top-1.5 p-0.5 hover:bg-slate-800 rounded text-teal-400 cursor-pointer transition-all z-10"
+                          className="opacity-0 group-hover:opacity-100 absolute right-1.5 top-1.5 hover:bg-slate-800 rounded text-teal-400 cursor-pointer transition-all z-10 border-0"
                           title="Agendar neste horário"
                         >
                           <Plus className="w-3.5 h-3.5" />
-                        </button>
+                        </Button>
 
                         {/* Appointments cards in this hour cell */}
                         {hourApps.map((app) => {
@@ -552,20 +579,28 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                             statusStyle = 'bg-teal-500/10 border-l-4 border-l-teal-500 border-slate-800/80 text-teal-400';
                           } else if (app.status === 'PENDING') {
                             statusStyle = 'bg-indigo-500/10 border-l-4 border-l-indigo-500 border-slate-800/80 text-indigo-400';
+                          } else if (app.status === 'COMPLETED') {
+                            statusStyle = 'bg-emerald-500/10 border-l-4 border-l-emerald-500 border-slate-800/80 text-emerald-400 line-through';
+                          } else if (app.status === 'NOSHOW') {
+                            statusStyle = 'bg-orange-500/10 border-l-4 border-l-orange-500 border-slate-800/80 text-orange-400 line-through';
                           } else {
                             statusStyle = 'bg-red-500/10 border-l-4 border-l-red-500 border-slate-800/80 text-red-400 line-through';
                           }
 
                           return (
-                            <button
+                            <Button
                               key={app.id}
                               type="button"
+                              variant="outline"
                               onClick={() => setSelectedApp(app)}
-                              className={`w-full text-left p-1.5 rounded-xl text-[10px] font-medium border truncate block transition-all cursor-pointer hover:brightness-125 shadow-sm ${statusStyle}`}
+                              className={cn(
+                                "w-full justify-start h-auto p-1.5 rounded-xl text-[10px] font-medium border truncate block transition-all cursor-pointer hover:brightness-125 shadow-sm",
+                                statusStyle
+                              )}
                             >
                               <span className="font-bold mr-1 block text-[9px] opacity-80">{timeStr}</span>
                               <span className="font-semibold block truncate">{app.customer.name}</span>
-                            </button>
+                            </Button>
                           );
                         })}
                       </div>
@@ -598,13 +633,15 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                   <CalendarIcon className="w-5 h-5 text-teal-400" />
                   Detalhes do Agendamento
                 </h3>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon-sm"
                   onClick={() => setSelectedApp(null)}
-                  className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 cursor-pointer"
+                  className="hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 cursor-pointer border-0"
                 >
                   <X className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
 
               {/* Details Body */}
@@ -679,6 +716,16 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                             Pendente
                           </span>
                         )}
+                        {selectedApp.status === 'COMPLETED' && (
+                          <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                            Compareceu
+                          </span>
+                        )}
+                        {selectedApp.status === 'NOSHOW' && (
+                          <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/10 border border-orange-500/20 text-orange-400">
+                            Não Compareceu
+                          </span>
+                        )}
                         {selectedApp.status === 'CANCELED' && (
                           <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 border border-red-500/20 text-red-400">
                             Cancelado
@@ -693,31 +740,33 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                 <div className="bg-slate-950/40 border border-white/5 p-4 rounded-2xl space-y-2">
                   <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block">Link de Agendamento</span>
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
                       readOnly
                       value={`${window.location.origin}/schedule/${selectedApp.token}`}
-                      className="glass-input text-xs text-slate-400 rounded-xl px-3 py-2 flex-1 focus:outline-none font-mono"
+                      className="h-8 bg-slate-950/40 border-white/5 text-xs text-slate-400 rounded-xl px-3 py-2 flex-1 focus:outline-none font-mono"
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
                       onClick={() => handleCopyLink(selectedApp.token)}
-                      className="px-3 bg-slate-950/40 border border-white/5 hover:border-white/10 rounded-xl text-xs font-bold text-teal-400 transition-colors flex items-center justify-center cursor-pointer active:scale-95"
+                      className="px-3 h-8 bg-slate-950/40 border border-white/5 hover:border-white/10 rounded-xl text-xs font-bold text-teal-400 transition-colors flex items-center justify-center cursor-pointer active:scale-95"
                     >
                       {copiedToken ? 'Copiado!' : <Copy className="w-3.5 h-3.5" />}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
 
               {/* Actions Footer */}
-              {selectedApp.status !== 'CANCELED' && (
+              {selectedApp.status !== 'CANCELED' && selectedApp.status !== 'COMPLETED' && selectedApp.status !== 'NOSHOW' && (
                 <div className="flex gap-3 pt-4 border-t border-white/5">
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     disabled={isPendingAction}
                     onClick={() => handleRescheduleAppointment(selectedApp)}
-                    className="flex-1 py-3 px-4 bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 text-indigo-400 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 h-10 bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 text-indigo-400 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {isPendingAction && actionType === 'reschedule' ? (
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -725,21 +774,22 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                       <RefreshCw className="w-3.5 h-3.5" />
                     )}
                     Reagendar
-                  </button>
+                  </Button>
 
-                  <button
+                  <Button
                     type="button"
+                    variant="destructive"
                     disabled={isPendingAction}
                     onClick={() => handleCancelAppointment(selectedApp)}
-                    className="flex-1 py-3 px-4 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 text-red-400 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 h-10 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     {isPendingAction && actionType === 'cancel' ? (
-                      <Trash2 className="w-3.5 h-3.5 animate-spin" />
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                     ) : (
                       <Trash2 className="w-3.5 h-3.5" />
                     )}
                     Cancelar
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>

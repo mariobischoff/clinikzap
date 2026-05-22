@@ -2,6 +2,15 @@
 
 Full-stack Next.js app for clinic appointment scheduling via WhatsApp.
 
+## Installed skills (skills.sh)
+
+| Skill | Source | When it loads |
+|---|---|---|
+| `shadcn` | shadcn/ui | Working with shadcn components |
+| `prisma-*` (7) | prisma/skills | Database schema, client, migrations, CLI, Postgres |
+| `vitest` | antfu/skills | Writing or running tests |
+| `playwright-best-practices` | currents-dev/playwright-best-practices-skill | E2E testing with Playwright |
+
 ## Quick start
 
 ```bash
@@ -16,14 +25,16 @@ npm run dev                             # http://localhost:3000
 | Command | Purpose |
 |---|---|
 | `npm run dev` | Next.js dev server (port 3000) |
-| `npm run build` | Production build (runs via CI; also catches type errors) |
-| `npm run lint` | ESLint (flat config, `eslint.config.mjs`) |
-| `npx prisma generate` | Generate Prisma client (needed after pulls) |
+| `npm run build` | Production build (catches type errors) |
+| `npm run lint` | ESLint (flat config) |
+| `npm run test` | Vitest unit + integration tests |
+| `npm run test:coverage` | Vitest with coverage report |
+| `npm run test:e2e` | Playwright E2E tests (dev server required) |
+| `npm run seed` | Seed DB with test data (`tsx prisma/seed.ts`) |
+| `npx prisma generate` | Generate Prisma client (after pulls) |
 | `npx prisma migrate dev` | Create & apply dev migrations |
-| `node tests/test-webhook.js` | Manual webhook test (dev server must be running) |
-| `node tests/test-cron.js` | Manual cron reminder test (dev server must be running) |
-
-Tests are automated with **Vitest**. Run `npm run test` to run the suite, or `npm run test:coverage` to check coverage. Manual webhook/cron test scripts are also available.
+| `node tests/test-webhook.js` | Manual webhook test (dev server running) |
+| `node tests/test-cron.js` | Manual cron reminder test (dev server running) |
 
 ## Architecture
 
@@ -31,8 +42,10 @@ Tests are automated with **Vitest**. Run `npm run test` to run the suite, or `np
 - **Auth.js v5 beta** (`next-auth@5.0.0-beta.25`) — Credentials provider + JWT strategy + Prisma adapter. No OAuth.
 - **TailwindCSS v4** — CSS-first (`@import "tailwindcss"`), no `tailwind.config.*`. Theme uses `@theme inline`.
 - **Prisma v6** with PostgreSQL — migrations run via `prisma migrate deploy` at container startup in production.
+- **shadcn/ui v4** (base-nova style + `@base-ui/react`) — components in `src/components/ui/`.
+- **Design system** documented in `DESIGN.md` — glassmorphism, colors, classes (`.glass-panel`, `.glass-input`, etc.).
 - **No formatter** configured. Only ESLint for linting.
-- **No database seed script** exists.
+- **Seed script** at `prisma/seed.ts` (run via `npm run seed`).
 
 ## Data flow
 
@@ -58,7 +71,7 @@ Tests are automated with **Vitest**. Run `npm run test` to run the suite, or `np
 - **Expose localhost for WhatsApp testing** via `npx localtunnel` or `ssh -p 443 -R0:localhost:3000 qr@a.pinggy.io`.
 - **`force-dynamic`** is set on dashboard and cron routes to prevent caching.
 - **Template messages** use `{variable}` syntax (`parseTemplate` in `src/utils/template-parser.ts`).
-- **`src/app/api/whatsapp/webhook/`** is an empty/unused directory — the real webhook is at `src/app/api/webhook/whatsapp/`.
+- **`src/app/api/whatsapp/webhook/`** is dead code — the real webhook is at `src/app/api/webhook/whatsapp/`.
 - **CI** (`.github/workflows/deploy.yml`) runs `prisma generate` + `npm run build` only — no lint, no tests.
 
 ## Key environment variables
@@ -66,6 +79,7 @@ Tests are automated with **Vitest**. Run `npm run test` to run the suite, or `np
 - `DATABASE_URL` — PostgreSQL connection
 - `EVOLUTION_API_URL` / `EVOLUTION_API_KEY` / `EVOLUTION_INSTANCE_NAME`
 - `NEXT_PUBLIC_APP_URL` — base URL for scheduling links
+- `EVOLUTION_SEND_IN_DEV` — set `true` to actually send WhatsApp in dev (default: `false` logs to console)
 - `AUTH_SECRET` — NextAuth encryption secret
 - `CRON_SECRET` — optional bearer token for cron endpoint
 - `REDIS_URL` — Redis connection (prod only)

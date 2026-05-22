@@ -63,11 +63,13 @@ export default async function DashboardPage() {
   const confirmed = appointments.filter((a) => a.status === 'CONFIRMED').length;
   const pending = appointments.filter((a) => a.status === 'PENDING').length;
   const canceled = appointments.filter((a) => a.status === 'CANCELED').length;
+  const completed = appointments.filter((a) => a.status === 'COMPLETED').length;
+  const noshow = appointments.filter((a) => a.status === 'NOSHOW').length;
 
   const appointmentsQueue = (
     <div className="space-y-8">
       {/* Metrics Widgets */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
         <div className="glass-panel glass-panel-hover rounded-3xl p-5">
           <span className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total</span>
           <p className="text-3xl font-bold mt-2 text-slate-100">{total}</p>
@@ -86,6 +88,16 @@ export default async function DashboardPage() {
         <div className="glass-panel glass-panel-hover rounded-3xl p-5">
           <span className="text-red-400 text-xs font-semibold uppercase tracking-wider">Cancelados</span>
           <p className="text-3xl font-bold mt-2 text-red-400">{canceled}</p>
+        </div>
+
+        <div className="glass-panel glass-panel-hover rounded-3xl p-5">
+          <span className="text-emerald-400 text-xs font-semibold uppercase tracking-wider">Compareceram</span>
+          <p className="text-3xl font-bold mt-2 text-emerald-400">{completed}</p>
+        </div>
+
+        <div className="glass-panel glass-panel-hover rounded-3xl p-5">
+          <span className="text-orange-400 text-xs font-semibold uppercase tracking-wider">Não Compareceram</span>
+          <p className="text-3xl font-bold mt-2 text-orange-400">{noshow}</p>
         </div>
       </div>
 

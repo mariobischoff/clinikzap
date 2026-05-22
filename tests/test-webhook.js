@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- standalone script
 const http = require('http');
 
 const payload = JSON.stringify({

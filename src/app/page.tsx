@@ -8,6 +8,9 @@ import {
   Sparkles,
   Check
 } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 export default function Home() {
   return (
@@ -39,15 +42,21 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link 
-              href="/login" 
-              className="px-4 py-2 border border-white/10 hover:border-teal-500/40 bg-white/5 hover:bg-teal-500/5 text-slate-200 hover:text-white rounded-2xl text-xs font-bold transition-all"
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "px-4 py-2 border border-white/10 hover:border-teal-500/40 bg-white/5 hover:bg-teal-500/5 text-slate-200 hover:text-white rounded-2xl text-xs font-bold transition-all h-auto cursor-pointer"
+              )}
             >
               Acessar Painel
             </Link>
-            <Link 
-              href="/register" 
-              className="px-4 py-2 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white rounded-2xl text-xs font-bold transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.02]"
+            <Link
+              href="/register"
+              className={cn(
+                buttonVariants(),
+                "px-4 py-2 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white rounded-2xl text-xs font-bold transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.02] border-none h-auto cursor-pointer"
+              )}
             >
               Criar Conta
             </Link>
@@ -74,16 +83,22 @@ export default function Home() {
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto sm:max-w-none">
-            <Link 
-              href="/register" 
-              className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-bold text-xs rounded-2xl transition-all shadow-xl shadow-teal-500/25 flex items-center justify-center gap-2 group cursor-pointer hover:scale-[1.02]"
+            <Link
+              href="/register"
+              className={cn(
+                buttonVariants(),
+                "w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-bold text-xs rounded-2xl transition-all shadow-xl shadow-teal-500/25 flex items-center justify-center gap-2 group cursor-pointer hover:scale-[1.02] border-none h-auto"
+              )}
             >
               Começar Agora Grátis
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link 
-              href="/login" 
-              className="w-full sm:w-auto px-8 py-3.5 border border-white/10 hover:border-teal-500/30 bg-slate-900/40 hover:bg-slate-900/60 text-slate-200 hover:text-white font-bold text-xs rounded-2xl transition-all cursor-pointer"
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "w-full sm:w-auto px-8 py-3.5 border border-white/10 hover:border-teal-500/30 bg-slate-900/40 hover:bg-slate-900/60 text-slate-200 hover:text-white font-bold text-xs rounded-2xl transition-all cursor-pointer h-auto"
+              )}
             >
               Acessar Minha Conta
             </Link>
@@ -184,37 +199,43 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             {/* Feature 1 */}
-            <div className="glass-panel glass-panel-hover rounded-3xl p-7 space-y-4 group">
-              <div className="w-10 h-10 bg-teal-500/10 text-teal-400 border border-teal-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Calendar className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-slate-100">Agenda Inteligente e Dinâmica</h3>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                Configure a duração padrão de consultas, gere horários disponíveis de acordo com seu expediente e controle bloqueios com exceções automáticas de ausência.
-              </p>
-            </div>
+            <Card className="glass-panel glass-panel-hover rounded-3xl p-7 space-y-4 group border-none bg-transparent text-left">
+              <CardContent className="p-0 space-y-4">
+                <div className="w-10 h-10 bg-teal-500/10 text-teal-400 border border-teal-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-100">Agenda Inteligente e Dinâmica</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Configure a duração padrão de consultas, gere horários disponíveis de acordo com seu expediente e controle bloqueios com exceções automáticas de ausência.
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Feature 2 */}
-            <div className="glass-panel glass-panel-hover rounded-3xl p-7 space-y-4 group">
-              <div className="w-10 h-10 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <MessageSquare className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-slate-100">Notificações por WhatsApp</h3>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                Envie confirmações e lembretes de consultas automáticos no WhatsApp. Customize a antecedência dos envios e os templates de mensagens usando variáveis inteligentes.
-              </p>
-            </div>
+            <Card className="glass-panel glass-panel-hover rounded-3xl p-7 space-y-4 group border-none bg-transparent text-left">
+              <CardContent className="p-0 space-y-4">
+                <div className="w-10 h-10 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-100">Notificações por WhatsApp</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Envie confirmações e lembretes de consultas automáticos no WhatsApp. Customize a antecedência dos envios e os templates de mensagens usando variáveis inteligentes.
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Feature 3 */}
-            <div className="glass-panel glass-panel-hover rounded-3xl p-7 space-y-4 group">
-              <div className="w-10 h-10 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Users className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-slate-100">CRM de Pacientes & Anotações</h3>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                Histórico detalhado por paciente, métricas individuais de comparecimento e campo de prontuário/anotações clínicas persistentes acopladas ao cadastro.
-              </p>
-            </div>
+            <Card className="glass-panel glass-panel-hover rounded-3xl p-7 space-y-4 group border-none bg-transparent text-left">
+              <CardContent className="p-0 space-y-4">
+                <div className="w-10 h-10 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Users className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-100">CRM de Pacientes & Anotações</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Histórico detalhado por paciente, métricas individuais de comparecimento e campo de prontuário/anotações clínicas persistentes acopladas ao cadastro.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -343,35 +364,41 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="glass-panel rounded-3xl p-6 text-center space-y-4">
-              <div className="w-10 h-10 mx-auto rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 font-bold text-xs flex items-center justify-center shadow-inner">
-                1
-              </div>
-              <h4 className="text-xs font-bold text-slate-200">Crie sua Conta</h4>
-              <p className="text-[10px] text-slate-450 leading-relaxed max-w-xs mx-auto">
-                Registre sua clínica e defina o tempo padrão das consultas e seus horários de atendimento.
-              </p>
-            </div>
+            <Card className="glass-panel rounded-3xl p-6 text-center space-y-4 border-none bg-transparent">
+              <CardContent className="p-0 space-y-4">
+                <div className="w-10 h-10 mx-auto rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 font-bold text-xs flex items-center justify-center shadow-inner">
+                  1
+                </div>
+                <h4 className="text-xs font-bold text-slate-200">Crie sua Conta</h4>
+                <p className="text-[10px] text-slate-450 leading-relaxed max-w-xs mx-auto">
+                  Registre sua clínica e defina o tempo padrão das consultas e seus horários de atendimento.
+                </p>
+              </CardContent>
+            </Card>
 
-            <div className="glass-panel rounded-3xl p-6 text-center space-y-4">
-              <div className="w-10 h-10 mx-auto rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold text-xs flex items-center justify-center shadow-inner">
-                2
-              </div>
-              <h4 className="text-xs font-bold text-slate-200">Conecte o WhatsApp</h4>
-              <p className="text-[10px] text-slate-455 leading-relaxed max-w-xs mx-auto">
-                Escaneie o QR Code na aba do WhatsApp para parear o sistema. Customize os templates de mensagens.
-              </p>
-            </div>
+            <Card className="glass-panel rounded-3xl p-6 text-center space-y-4 border-none bg-transparent">
+              <CardContent className="p-0 space-y-4">
+                <div className="w-10 h-10 mx-auto rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold text-xs flex items-center justify-center shadow-inner">
+                  2
+                </div>
+                <h4 className="text-xs font-bold text-slate-200">Conecte o WhatsApp</h4>
+                <p className="text-[10px] text-slate-455 leading-relaxed max-w-xs mx-auto">
+                  Escaneie o QR Code na aba do WhatsApp para parear o sistema. Customize os templates de mensagens.
+                </p>
+              </CardContent>
+            </Card>
 
-            <div className="glass-panel rounded-3xl p-6 text-center space-y-4">
-              <div className="w-10 h-10 mx-auto rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 font-bold text-xs flex items-center justify-center shadow-inner">
-                3
-              </div>
-              <h4 className="text-xs font-bold text-slate-200">Agende & Automatize</h4>
-              <p className="text-[10px] text-slate-455 leading-relaxed max-w-xs mx-auto">
-                Crie consultas na agenda e deixe que a nossa plataforma faça o disparo de lembretes e confirmações automáticos.
-              </p>
-            </div>
+            <Card className="glass-panel rounded-3xl p-6 text-center space-y-4 border-none bg-transparent">
+              <CardContent className="p-0 space-y-4">
+                <div className="w-10 h-10 mx-auto rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 font-bold text-xs flex items-center justify-center shadow-inner">
+                  3
+                </div>
+                <h4 className="text-xs font-bold text-slate-200">Agende & Automatize</h4>
+                <p className="text-[10px] text-slate-455 leading-relaxed max-w-xs mx-auto">
+                  Crie consultas na agenda e deixe que a nossa plataforma faça o disparo de lembretes e confirmações automáticos.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -389,9 +416,12 @@ export default function Home() {
                 Junte-se a dezenas de profissionais de saúde que reduziram faltas de pacientes, otimizaram sua agenda de consultas e ganharam muito mais tempo no dia a dia.
               </p>
               <div className="pt-2">
-                <Link 
-                  href="/register" 
-                  className="inline-flex px-8 py-3.5 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-extrabold text-xs rounded-2xl transition-all shadow-lg shadow-teal-500/25 hover:scale-[1.02]"
+                <Link
+                  href="/register"
+                  className={cn(
+                    buttonVariants(),
+                    "inline-flex px-8 py-3.5 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-extrabold text-xs rounded-2xl transition-all shadow-lg shadow-teal-500/25 hover:scale-[1.02] border-none h-auto cursor-pointer"
+                  )}
                 >
                   Começar Grátis Agora
                 </Link>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface CopyLinkButtonProps {
   token: string;
@@ -24,12 +25,15 @@ export default function CopyLinkButton({ token }: CopyLinkButtonProps) {
   };
 
   return (
-    <button
+    <Button
+      variant="outline"
+      size="icon"
+      type="button"
       onClick={handleCopy}
       title="Copiar Link de Agendamento"
-      className="p-1.5 bg-slate-800 hover:bg-slate-700/80 border border-slate-700/50 rounded-lg text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+      className="bg-slate-800 hover:bg-slate-700/80 border-slate-700/50 text-slate-400 hover:text-slate-200 rounded-lg cursor-pointer"
     >
       {copied ? <Check className="w-3.5 h-3.5 text-teal-400" /> : <Copy className="w-3.5 h-3.5" />}
-    </button>
+    </Button>
   );
 }

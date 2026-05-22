@@ -8,6 +8,11 @@ import {
   Clock,
   Save,
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface NotificationSettingsProps {
   initialConfirmationTemplate: string | null;
@@ -119,13 +124,13 @@ export default function NotificationSettings({
           </div>
 
           <div className="flex items-center gap-3 max-w-[200px] pt-1">
-            <input
+            <Input
               type="number"
               min="1"
               max="168"
               value={reminderHours}
               onChange={(e) => setReminderHours(Number(e.target.value))}
-              className="w-full glass-input rounded-2xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none transition-all font-mono"
+              className="w-full h-10 bg-slate-950/40 border-white/5 text-slate-200 rounded-2xl px-4 text-xs font-mono"
             />
             <span className="text-xs text-slate-400 font-semibold shrink-0">horas antes</span>
           </div>
@@ -149,91 +154,97 @@ export default function NotificationSettings({
           <div className="space-y-6">
             {/* Confirmation */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-200">Mensagem de Confirmação (Novo Agendamento)</label>
-                <div className="flex gap-1.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <Label className="text-xs font-bold text-slate-200">Mensagem de Confirmação (Novo Agendamento)</Label>
+                <div className="flex flex-wrap gap-1.5">
                   {['{nome_paciente}', '{nome_clinica}', '{data_consulta}', '{hora_consulta}'].map((v) => (
-                    <button
+                    <Button
                       key={v}
                       type="button"
+                      variant="outline"
+                      size="xs"
                       onClick={() => insertVariable(v, 'confirmation')}
-                      className="text-[9px] bg-slate-950 border border-slate-850 hover:border-slate-750 text-slate-450 hover:text-slate-300 px-2 py-0.5 rounded-lg transition-all"
+                      className="text-[9px] bg-slate-950 border border-slate-850 hover:border-slate-750 text-slate-400 hover:text-slate-350 px-2 py-0.5 rounded-lg transition-all cursor-pointer"
                     >
                       {v}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
-              <textarea
+              <Textarea
                 value={confirmationTemplate}
                 onChange={(e) => setConfirmationTemplate(e.target.value)}
                 rows={4}
-                className="w-full glass-input rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-600 focus:outline-none resize-y leading-relaxed font-mono"
+                className="w-full bg-slate-950/40 border-white/5 rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-650 focus:outline-none resize-y leading-relaxed font-mono"
               />
             </div>
 
             {/* Cancellation */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-200">Mensagem de Cancelamento</label>
-                <div className="flex gap-1.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <Label className="text-xs font-bold text-slate-200">Mensagem de Cancelamento</Label>
+                <div className="flex flex-wrap gap-1.5">
                   {['{nome_paciente}', '{nome_clinica}', '{data_consulta}', '{hora_consulta}'].map((v) => (
-                    <button
+                    <Button
                       key={v}
                       type="button"
+                      variant="outline"
+                      size="xs"
                       onClick={() => insertVariable(v, 'cancellation')}
-                      className="text-[9px] bg-slate-950 border border-slate-850 hover:border-slate-750 text-slate-450 hover:text-slate-300 px-2 py-0.5 rounded-lg transition-all"
+                      className="text-[9px] bg-slate-950 border border-slate-850 hover:border-slate-750 text-slate-400 hover:text-slate-350 px-2 py-0.5 rounded-lg transition-all cursor-pointer"
                     >
                       {v}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
-              <textarea
+              <Textarea
                 value={cancellationTemplate}
                 onChange={(e) => setCancellationTemplate(e.target.value)}
                 rows={3}
-                className="w-full glass-input rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-600 focus:outline-none resize-y leading-relaxed font-mono"
+                className="w-full bg-slate-950/40 border-white/5 rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-655 focus:outline-none resize-y leading-relaxed font-mono"
               />
             </div>
 
             {/* Reminder */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-200">Mensagem de Lembrete</label>
-                <div className="flex gap-1.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <Label className="text-xs font-bold text-slate-200">Mensagem de Lembrete</Label>
+                <div className="flex flex-wrap gap-1.5">
                   {['{nome_paciente}', '{nome_clinica}', '{data_consulta}', '{hora_consulta}'].map((v) => (
-                    <button
+                    <Button
                       key={v}
                       type="button"
+                      variant="outline"
+                      size="xs"
                       onClick={() => insertVariable(v, 'reminder')}
-                      className="text-[9px] bg-slate-950 border border-slate-850 hover:border-slate-750 text-slate-450 hover:text-slate-300 px-2 py-0.5 rounded-lg transition-all"
+                      className="text-[9px] bg-slate-950 border border-slate-850 hover:border-slate-750 text-slate-400 hover:text-slate-350 px-2 py-0.5 rounded-lg transition-all cursor-pointer"
                     >
                       {v}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
-              <textarea
+              <Textarea
                 value={reminderTemplate}
                 onChange={(e) => setReminderTemplate(e.target.value)}
                 rows={4}
-                className="w-full glass-input rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-600 focus:outline-none resize-y leading-relaxed font-mono"
+                className="w-full bg-slate-950/40 border-white/5 rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-655 focus:outline-none resize-y leading-relaxed font-mono"
               />
             </div>
           </div>
 
           {/* Action Save Button */}
           <div className="pt-2 border-t border-slate-850 flex justify-end">
-            <button
+            <Button
               type="button"
               disabled={isPending}
               onClick={handleSave}
-              className="px-6 py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-2xl transition-all shadow-lg shadow-teal-500/10 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-6 py-3 h-10 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-2xl transition-all shadow-lg shadow-teal-500/10 flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
               {isPending ? 'Salvando...' : 'Salvar Configurações'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -246,18 +257,20 @@ export default function NotificationSettings({
           {/* Preview Tabs selectors */}
           <div className="flex bg-slate-950/40 backdrop-blur-md border border-white/5 p-1.5 rounded-2xl gap-1">
             {(['confirmation', 'cancellation', 'reminder'] as const).map((tab) => (
-              <button
+              <Button
                 key={tab}
                 type="button"
+                variant={activePreviewTab === tab ? "outline" : "ghost"}
                 onClick={() => setActivePreviewTab(tab)}
-                className={`flex-1 text-[10px] font-bold py-2 rounded-xl transition-all cursor-pointer ${
+                className={cn(
+                  "flex-1 text-[10px] font-bold py-2 h-8 rounded-xl cursor-pointer border-0",
                   activePreviewTab === tab
-                    ? 'bg-slate-850 text-teal-400 border border-slate-750 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-350'
-                }`}
+                    ? 'bg-slate-850 text-teal-400 shadow-sm hover:text-teal-450 hover:bg-slate-800'
+                    : 'text-slate-500 hover:text-slate-350 hover:bg-transparent'
+                )}
               >
                 {tab === 'confirmation' ? 'Confirmação' : tab === 'cancellation' ? 'Cancelado' : 'Lembrete'}
-              </button>
+              </Button>
             ))}
           </div>
 

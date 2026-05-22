@@ -40,8 +40,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify it is not already canceled
-    if (originalAppointment.status === 'CANCELED') {
-      return NextResponse.json({ error: 'Appointment is already canceled' }, { status: 400 });
+    if (originalAppointment.status === 'CANCELED' || originalAppointment.status === 'COMPLETED' || originalAppointment.status === 'NOSHOW') {
+      return NextResponse.json({ error: `Appointment is already '${originalAppointment.status}'` }, { status: 400 });
     }
 
     // 2. Perform transaction: Cancel original, create new pending

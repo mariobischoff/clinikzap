@@ -6,6 +6,7 @@ import { RefreshCw, MessageSquare, AlertCircle, CheckCircle2, QrCode, LogOut } f
 import { disconnectWhatsapp, getWhatsappStatus } from './actions';
 import { toast } from 'sonner';
 import ConfirmationModal from '@/components/confirmation-modal';
+import { Button } from '@/components/ui/button';
 
 interface EvolutionConnectionPanelProps {
   initialStatus: string;
@@ -84,15 +85,16 @@ export default function EvolutionConnectionPanel({
           </p>
         </div>
 
-        <button
+        <Button
+          variant="outline"
           type="button"
           disabled={loading || isPending}
           onClick={() => checkStatus(true)}
-          className="self-start px-4 py-2.5 bg-slate-900 border border-slate-800 hover:border-slate-700 disabled:opacity-50 rounded-2xl text-xs font-semibold text-slate-300 flex items-center gap-2 transition-all cursor-pointer"
+          className="self-start px-4 py-2.5 bg-slate-900/40 border-slate-800 hover:bg-slate-850 text-slate-300 rounded-2xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer h-auto"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           {loading ? 'Atualizando...' : 'Atualizar Status'}
-        </button>
+        </Button>
       </div>
 
       <AnimatePresence mode="wait">
@@ -108,13 +110,14 @@ export default function EvolutionConnectionPanel({
             <div>
               <h3 className="font-bold text-slate-200">Falha na Conexão</h3>
               <p className="text-sm mt-1">{errorMsg}</p>
-              <button
+              <Button
+                variant="outline"
                 type="button"
                 onClick={() => checkStatus(true)}
-                className="mt-3 text-xs bg-red-500/20 hover:bg-red-500/30 text-slate-200 px-3 py-1.5 rounded-xl border border-red-500/30 font-semibold cursor-pointer transition-all"
+                className="mt-3 text-xs bg-red-500/10 hover:bg-red-500/20 text-slate-200 px-3 py-1.5 rounded-xl border border-red-500/30 font-semibold cursor-pointer transition-all h-auto"
               >
                 Tentar Novamente
-              </button>
+              </Button>
             </div>
           </motion.div>
         ) : (
@@ -177,15 +180,16 @@ export default function EvolutionConnectionPanel({
                   </div>
                   
                   <div className="w-full pt-2">
-                    <button
+                    <Button
+                      variant="destructive"
                       type="button"
                       disabled={isPending}
                       onClick={handleDisconnect}
-                      className="w-full py-3 px-4 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                      className="w-full py-3 px-4 bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 h-auto"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       {isPending ? 'Desconectando...' : 'Desconectar WhatsApp'}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : qrCodeBase64 ? (

@@ -6,6 +6,7 @@ import { redisMock } from '../setup/redis-mock';
 vi.mock('@/services/evolution', () => ({
   EvolutionService: {
     sendTextMessage: vi.fn().mockResolvedValue({ success: true }),
+    getInstanceNameById: vi.fn().mockResolvedValue(null),
   },
 }));
 
@@ -25,7 +26,9 @@ const mockClinic = {
   updatedAt: new Date(),
 };
 
-function createRequest(overrides: Record<string, any> = {}): NextRequest {
+function createRequest(
+  overrides: Record<string, unknown> = {}
+): NextRequest {
   const body = {
     event: 'messages.upsert',
     instanceId: 'test-instance',

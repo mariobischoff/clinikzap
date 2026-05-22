@@ -36,11 +36,11 @@ async function main() {
   console.log(`Clinica criada: ${clinic.name} (${clinic.email})`);
 
   const customer = await prisma.customer.upsert({
-    where: { phone_userId: { phone: '+5511999999999', userId: clinic.id } },
+    where: { phone_userId: { phone: '5511999999999', userId: clinic.id } },
     update: {},
     create: {
       name: 'João Silva',
-      phone: '+5511999999999',
+      phone: '5511999999999',
       userId: clinic.id,
       notes: 'Paciente recorrente, prefere período da manhã.',
     },

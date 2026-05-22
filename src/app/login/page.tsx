@@ -2,6 +2,10 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 interface LoginPageProps {
   searchParams: Promise<{ error?: string }>;
@@ -53,66 +57,68 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '3s' }} />
       </div>
 
-      <div className="relative w-full max-w-md glass-panel rounded-3xl p-8 shadow-2xl z-10">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">
+      <Card className="relative w-full max-w-md glass-panel rounded-3xl p-8 shadow-2xl z-10 border-none bg-transparent">
+        <CardHeader className="text-center mb-8 p-0">
+          <CardTitle className="text-3xl font-bold tracking-tight bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">
             ClinikZap
-          </h1>
-          <p className="text-slate-400 mt-2 text-sm">
+          </CardTitle>
+          <CardDescription className="text-slate-400 mt-2 text-sm">
             Entre na sua conta para gerenciar seus agendamentos
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          {errorMsg && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-2xl">
+              {errorMsg}
+            </div>
+          )}
+
+          <form action={handleLogin} className="space-y-6">
+            <div>
+              <Label htmlFor="email" className="block text-sm font-medium text-slate-350 mb-2">
+                Endereço de E-mail
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                required
+                className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
+                placeholder="clinica@exemplo.com"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="password" className="block text-sm font-medium text-slate-355 mb-2">
+                Senha
+              </Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+            >
+              Entrar
+            </Button>
+          </form>
+
+          <p className="text-center text-sm text-slate-400 mt-6">
+            Ainda não tem conta?{' '}
+            <Link href="/register" className="text-teal-400 hover:underline font-medium">
+              Cadastrar Clínica
+            </Link>
           </p>
-        </div>
-
-        {errorMsg && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-2xl">
-            {errorMsg}
-          </div>
-        )}
-
-        <form action={handleLogin} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-350 mb-2">
-              Endereço de E-mail
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
-              placeholder="clinica@exemplo.com"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-355 mb-2">
-              Senha
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-          >
-            Entrar
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-slate-400 mt-6">
-          Ainda não tem conta?{' '}
-          <Link href="/register" className="text-teal-400 hover:underline font-medium">
-            Cadastrar Clínica
-          </Link>
-        </p>
-      </div>
+        </CardContent>
+      </Card>
     </main>
   );
 }

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-export function buildUser(overrides: Record<string, any> = {}) {
+export function buildUser(overrides: Record<string, unknown> = {}) {
   return {
     id: faker.string.uuid(),
     name: faker.company.name(),
@@ -19,7 +19,7 @@ export function buildUser(overrides: Record<string, any> = {}) {
   };
 }
 
-export function buildCustomer(overrides: Record<string, any> = {}) {
+export function buildCustomer(overrides: Record<string, unknown> = {}) {
   return {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
@@ -32,7 +32,7 @@ export function buildCustomer(overrides: Record<string, any> = {}) {
   };
 }
 
-export function buildAppointment(overrides: Record<string, any> = {}) {
+export function buildAppointment(overrides: Record<string, unknown> = {}) {
   return {
     id: faker.string.uuid(),
     customerId: faker.string.uuid(),

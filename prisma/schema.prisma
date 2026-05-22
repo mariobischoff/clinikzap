@@ -26,6 +26,9 @@ model User {
   cancellationTemplate   String?
   reminderTemplate       String?
   reminderHours           Int                     @default(24) // Trigger time for reminders (hours before)
+
+  // Multi-instance routing: each clinic has their own Evolution instance
+  evolutionInstanceName  String?                 @unique
 }
 
 model Customer {
@@ -47,6 +50,8 @@ enum AppointmentStatus {
   PENDING
   CONFIRMED
   CANCELED
+  COMPLETED
+  NOSHOW
 }
 
 model Appointment {

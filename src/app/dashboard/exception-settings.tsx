@@ -6,6 +6,10 @@ import { Calendar, Plus, Trash2, Clock, Ban } from 'lucide-react';
 import { generateSlotsForDuration } from './weekly-settings';
 import { toast } from 'sonner';
 import ConfirmationModal from '@/components/confirmation-modal';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface ExceptionRecord {
   id: string;
@@ -97,16 +101,16 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
 
         {/* Date Selector */}
         <div className="space-y-2">
-          <label htmlFor="exception-date" className="text-xs font-semibold text-slate-400">
+          <Label htmlFor="exception-date" className="text-xs font-semibold text-slate-400">
             Selecione a Data
-          </label>
-          <input
+          </Label>
+          <Input
             id="exception-date"
             type="date"
             min={todayStr}
             value={dateStr}
             onChange={(e) => setDateStr(e.target.value)}
-            className="w-full glass-input rounded-2xl px-4 py-3 text-slate-200 focus:outline-none focus:border-teal-500/50 transition-all text-sm [color-scheme:dark]"
+            className="w-full h-12 bg-slate-950/40 border-white/5 text-slate-200 rounded-2xl px-4 text-sm [color-scheme:dark]"
           />
         </div>
 
@@ -114,31 +118,35 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
         <div className="space-y-3">
           <span className="text-xs font-semibold text-slate-400 block">Tipo de Exceção</span>
           <div className="grid grid-cols-2 gap-4">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => setBlockAllDay(true)}
-              className={`p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer flex flex-col items-center justify-center gap-2 ${
+              className={cn(
+                "p-4 h-24 rounded-2xl border text-sm font-semibold transition-all cursor-pointer flex flex-col items-center justify-center gap-2",
                 blockAllDay
-                  ? 'bg-red-500/10 border-red-500/30 text-red-400'
-                  : 'bg-slate-950/40 border-white/5 text-slate-500 hover:border-white/10'
-              }`}
+                  ? 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/15 hover:text-red-400'
+                  : 'bg-slate-950/40 border-white/5 text-slate-500 hover:border-white/10 hover:text-slate-400'
+              )}
             >
               <Ban className="w-5 h-5" />
               Bloquear Dia Inteiro
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => setBlockAllDay(false)}
-              className={`p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer flex flex-col items-center justify-center gap-2 ${
+              className={cn(
+                "p-4 h-24 rounded-2xl border text-sm font-semibold transition-all cursor-pointer flex flex-col items-center justify-center gap-2",
                 !blockAllDay
-                  ? 'bg-teal-500/10 border-teal-500/30 text-teal-400'
-                  : 'bg-slate-950/40 border-white/5 text-slate-500 hover:border-white/10'
-              }`}
+                  ? 'bg-teal-500/10 border-teal-500/30 text-teal-400 hover:bg-teal-500/15 hover:text-teal-400'
+                  : 'bg-slate-950/40 border-white/5 text-slate-500 hover:border-white/10 hover:text-slate-400'
+              )}
             >
               <Clock className="w-5 h-5" />
               Horários Customizados
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -152,18 +160,20 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
               {allPossibleSlots.map((slot) => {
                 const isSelected = selectedSlots.includes(slot);
                 return (
-                  <button
+                  <Button
                     key={slot}
                     type="button"
+                    variant="outline"
                     onClick={() => handleToggleSlot(slot)}
-                    className={`p-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer text-center ${
+                    className={cn(
+                      "h-9 rounded-xl border text-xs font-semibold transition-all cursor-pointer text-center",
                       isSelected
-                        ? 'bg-teal-500/10 border-teal-500/30 text-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.05)]'
-                        : 'bg-slate-950/40 border-white/5 hover:border-white/10 text-slate-500'
-                    }`}
+                        ? 'bg-teal-500/10 border-teal-500/30 text-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.05)] hover:bg-teal-500/15 hover:text-teal-400'
+                        : 'bg-slate-950/40 border-white/5 hover:border-white/10 text-slate-500 hover:text-slate-400'
+                    )}
                   >
                     {slot}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -174,23 +184,24 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
           <div>
             {message && (
               <p
-                className={`text-xs font-semibold ${
+                className={cn(
+                  "text-xs font-semibold",
                   message.type === 'success' ? 'text-teal-400' : 'text-red-400'
-                }`}
+                )}
               >
                 {message.text}
               </p>
             )}
           </div>
 
-          <button
+          <Button
             type="button"
             onClick={handleSaveException}
             disabled={isPending}
-            className="w-full sm:w-auto px-5 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
+            className="w-full sm:w-auto px-5 py-2.5 h-10 bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
           >
             {isPending ? 'Salvando...' : 'Adicionar Exceção'}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -250,15 +261,16 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
                       )}
                     </div>
 
-                    <button
+                    <Button
                       type="button"
+                      variant="destructive"
                       disabled={isPending}
                       onClick={() => handleDeleteException(exc.id)}
                       title="Excluir exceção (restaurar padrão)"
-                      className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                      className="p-2 w-8 h-8 rounded-xl cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    </Button>
                   </div>
                 );
               })}

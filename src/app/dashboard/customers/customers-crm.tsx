@@ -18,11 +18,15 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { updateCustomerNotes } from '../actions';
+import { Input } from '@/components/ui/input';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 interface Appointment {
   id: string;
   appointmentDate: string | Date;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELED';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELED' | 'COMPLETED' | 'NOSHOW';
   token: string;
 }
 
@@ -115,7 +119,9 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
     const confirmed = cust.appointments.filter((a) => a.status === 'CONFIRMED').length;
     const pending = cust.appointments.filter((a) => a.status === 'PENDING').length;
     const canceled = cust.appointments.filter((a) => a.status === 'CANCELED').length;
-    return { total, confirmed, pending, canceled };
+    const completed = cust.appointments.filter((a) => a.status === 'COMPLETED').length;
+    const noshow = cust.appointments.filter((a) => a.status === 'NOSHOW').length;
+    return { total, confirmed, pending, canceled, completed, noshow };
   };
 
   return (
@@ -134,13 +140,13 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
           
           {/* Search Box */}
           <div className="relative">
-            <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
-            <input
+            <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500 z-10" />
+            <Input
               type="text"
               placeholder="Buscar por nome ou telefone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-700 transition-all font-medium"
+              className="w-full bg-slate-950/40 border-slate-800/80 focus:border-teal-500/50 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 transition-all font-medium h-10"
             />
           </div>
         </div>
@@ -156,10 +162,12 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
               const isSelected = cust.id === selectedCustomerId;
               const stats = getStats(cust);
               return (
-                <button
+                <Button
                   key={cust.id}
+                  variant="ghost"
+                  type="button"
                   onClick={() => handleSelectCustomer(cust.id)}
-                  className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group ${
+                  className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group h-auto ${
                     isSelected
                       ? 'bg-slate-800/50 border-slate-700 text-slate-100 shadow-md shadow-teal-500/5'
                       : 'bg-slate-950/30 border-slate-850 hover:bg-slate-850/30 text-slate-350 hover:text-slate-200'
@@ -177,7 +185,7 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
                     </div>
                   </div>
                   <ChevronRight className={`w-4 h-4 text-slate-600 transition-transform group-hover:translate-x-0.5 ${isSelected ? 'text-teal-400' : ''}`} />
-                </button>
+                </Button>
               );
             })
           )}
@@ -196,13 +204,14 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-850 pb-4 shrink-0">
               <div className="flex gap-3 items-center min-w-0">
                 {/* Back button on mobile */}
-                <button
+                <Button
+                  variant="outline"
                   type="button"
                   onClick={() => setMobileView('list')}
-                  className="md:hidden p-2 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-400 hover:text-slate-200 rounded-xl transition-all shrink-0 cursor-pointer"
+                  className="md:hidden p-2 bg-slate-950/40 border-slate-800 hover:bg-slate-850 text-slate-400 hover:text-slate-200 rounded-xl transition-all shrink-0 cursor-pointer h-9 w-9"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                </button>
+                </Button>
                 <div className="w-12 h-12 bg-gradient-to-tr from-teal-500 to-indigo-500 rounded-2xl flex items-center justify-center font-bold text-white shadow-lg shadow-teal-500/10 text-base shrink-0">
                   {selectedCustomer.name[0].toUpperCase()}
                 </div>
@@ -228,7 +237,10 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
                 href={`https://wa.me/${selectedCustomer.phone}`}
                 target="_blank"
                 rel="noreferrer"
-                className="self-start sm:self-center px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-2xl text-xs font-bold transition-all shadow-lg shadow-teal-500/10 flex items-center gap-2"
+                className={cn(
+                  buttonVariants(),
+                  "self-start sm:self-center px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-2xl text-xs font-bold transition-all shadow-lg shadow-teal-500/10 flex items-center gap-2 border-none h-auto"
+                )}
               >
                 <MessageSquare className="w-3.5 h-3.5 fill-current" />
                 Conversar no WhatsApp
@@ -236,7 +248,7 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
             </div>
 
             {/* Quick Metrics stats */}
-            <div className="grid grid-cols-4 gap-3 shrink-0">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 shrink-0">
               {(() => {
                 const s = getStats(selectedCustomer);
                 return (
@@ -252,6 +264,14 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
                     <div className="bg-slate-950 border border-slate-850 p-3 rounded-2xl">
                       <span className="text-[9px] uppercase tracking-wider text-indigo-450 font-semibold block">Pendentes</span>
                       <span className="text-lg font-bold text-indigo-450 mt-1 block">{s.pending}</span>
+                    </div>
+                    <div className="bg-slate-950 border border-slate-850 p-3 rounded-2xl">
+                      <span className="text-[9px] uppercase tracking-wider text-emerald-400/90 font-semibold block">Compareceram</span>
+                      <span className="text-lg font-bold text-emerald-400 mt-1 block">{s.completed}</span>
+                    </div>
+                    <div className="bg-slate-950 border border-slate-850 p-3 rounded-2xl">
+                      <span className="text-[9px] uppercase tracking-wider text-orange-400/90 font-semibold block">Faltaram</span>
+                      <span className="text-lg font-bold text-orange-400 mt-1 block">{s.noshow}</span>
                     </div>
                     <div className="bg-slate-950 border border-slate-850 p-3 rounded-2xl">
                       <span className="text-[9px] uppercase tracking-wider text-red-400/90 font-semibold block">Cancelados</span>
@@ -273,27 +293,28 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
                   </h4>
                   
                   {/* Save indicator / button */}
-                  <button
+                  <Button
                     type="button"
                     onClick={handleSaveNotes}
                     disabled={isPending || selectedCustomer.notes === notesDraft}
-                    className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1 disabled:opacity-30 cursor-pointer ${
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer h-auto border-none",
                       selectedCustomer.notes !== notesDraft
-                        ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/10 hover:bg-teal-400'
-                        : 'bg-slate-900 border border-slate-800 text-slate-400'
-                    }`}
+                        ? 'bg-teal-500 hover:bg-teal-400 text-slate-950 shadow-md shadow-teal-500/10'
+                        : 'bg-slate-900 text-slate-400 hover:bg-slate-900'
+                    )}
                   >
                     <Save className="w-3.5 h-3.5" />
                     {isPending ? 'Salvando...' : 'Salvar'}
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="flex-1 mt-3">
-                  <textarea
+                  <Textarea
                     placeholder="Adicione observações importantes sobre o histórico de saúde do paciente, recomendações médicas, restrições ou observações internas..."
                     value={notesDraft}
                     onChange={(e) => setNotesDraft(e.target.value)}
-                    className="w-full h-full bg-transparent border-0 resize-none text-xs text-slate-350 focus:outline-none placeholder-slate-600 leading-relaxed overflow-y-auto pr-1"
+                    className="w-full h-full bg-transparent border-none resize-none text-xs text-slate-350 focus-visible:ring-0 placeholder-slate-600 leading-relaxed overflow-y-auto pr-1 min-h-[150px] shadow-none"
                   />
                 </div>
               </div>
@@ -348,6 +369,18 @@ export default function CustomersCrm({ initialCustomers }: CustomersCrmProps) {
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
                                 <AlertCircle className="w-2.5 h-2.5" />
                                 Pendente
+                              </span>
+                            )}
+                            {app.status === 'COMPLETED' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                                <CheckCircle2 className="w-2.5 h-2.5" />
+                                Compareceu
+                              </span>
+                            )}
+                            {app.status === 'NOSHOW' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-orange-500/10 border border-orange-500/20 text-orange-400">
+                                <XCircle className="w-2.5 h-2.5" />
+                                Não Compareceu
                               </span>
                             )}
                             {app.status === 'CANCELED' && (

@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import Link from 'next/link';
 import SidebarNav from './sidebar-nav';
 import SignOutButton from './signout-button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -45,9 +46,11 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
         {/* User Info / LogOut */}
         <div className="p-4 border-t border-white/5 space-y-4 bg-slate-950/20">
           <div className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 bg-gradient-to-tr from-teal-500 to-indigo-500 rounded-full flex items-center justify-center font-bold text-white shadow-lg shadow-teal-500/25">
-              {session.user.name ? session.user.name[0].toUpperCase() : 'U'}
-            </div>
+            <Avatar className="w-10 h-10 bg-gradient-to-tr from-teal-500 to-indigo-500 rounded-full flex items-center justify-center font-bold text-white shadow-lg shadow-teal-500/25">
+              <AvatarFallback className="bg-transparent text-white font-bold text-base">
+                {session.user.name ? session.user.name[0].toUpperCase() : 'U'}
+              </AvatarFallback>
+            </Avatar>
             <div className="overflow-hidden">
               <p className="text-sm font-semibold text-slate-200 truncate">{session.user.name}</p>
               <p className="text-xs text-slate-500 truncate">{session.user.email}</p>

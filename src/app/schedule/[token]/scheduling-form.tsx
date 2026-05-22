@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Clock, CheckCircle2, ChevronRight, AlertCircle, User } from 'lucide-react';
 import { confirmAppointment, getAvailableSlots, type AppointmentDetails } from '../actions';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface SchedulingFormProps {
   appointment: AppointmentDetails;
@@ -149,18 +152,19 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
         {step === 1 && (
           <div className="space-y-6">
             <div>
-              <label className="text-sm font-medium text-slate-350 flex items-center gap-2 mb-3">
+              <Label className="text-sm font-medium text-slate-350 flex items-center gap-2 mb-3">
                 <CalendarIcon className="w-4 h-4 text-teal-400" />
                 Selecione o Dia da Consulta
-              </label>
+              </Label>
               
               {/* Horizontal Scroll Days List */}
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-800">
                 {datesList.map((d) => (
-                  <button
+                  <Button
                     key={d.fullDate}
+                    variant="outline"
                     onClick={() => setSelectedDate(d.fullDate)}
-                    className={`flex flex-col items-center justify-center p-3 rounded-2xl min-w-[70px] border transition-all cursor-pointer ${
+                    className={`flex flex-col items-center justify-center p-3 rounded-2xl min-w-[70px] border transition-all cursor-pointer h-auto ${
                       selectedDate === d.fullDate
                         ? 'bg-gradient-to-br from-teal-500 to-indigo-550 border-teal-400 text-white shadow-lg shadow-teal-500/20 scale-[1.03]'
                         : 'bg-slate-900/60 border-white/5 text-slate-300 hover:border-teal-500/40 hover:bg-slate-900'
@@ -172,19 +176,19 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
                     <span className="text-xl font-bold mt-1">
                       {d.dayNum}
                     </span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
 
-            <button
+            <Button
               onClick={() => setStep(2)}
               disabled={!selectedDate}
-              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
+              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99] border-none h-auto"
             >
               Escolher Horário
               <ChevronRight className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         )}
 
@@ -193,10 +197,10 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
           <div className="space-y-6">
             <div>
               <div className="flex justify-between items-center mb-3">
-                <label className="text-sm font-medium text-slate-350 flex items-center gap-2">
+                <Label className="text-sm font-medium text-slate-350 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-teal-400" />
                   Horários para {getFormattedSelectedDate()}
-                </label>
+                </Label>
                 <button
                   onClick={() => setStep(1)}
                   className="text-xs text-teal-400 hover:underline cursor-pointer"
@@ -214,17 +218,18 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
               ) : availableSlots.length > 0 ? (
                 <div className="grid grid-cols-3 gap-3">
                   {availableSlots.map((slot) => (
-                    <button
+                    <Button
+                      variant="outline"
                       key={slot}
                       onClick={() => setSelectedTime(slot)}
-                      className={`py-3 rounded-2xl border font-semibold text-center transition-all cursor-pointer ${
+                      className={`py-3 rounded-2xl border font-semibold text-center transition-all cursor-pointer h-auto ${
                         selectedTime === slot
-                          ? 'bg-gradient-to-br from-teal-500 to-indigo-550 border-teal-400 text-white shadow-lg shadow-teal-500/20'
+                          ? 'bg-gradient-to-br from-teal-500 to-indigo-550 border-teal-400 text-white shadow-lg shadow-teal-500/20 hover:text-white'
                           : 'bg-slate-900/60 border-white/5 text-slate-300 hover:border-teal-500/40 hover:bg-slate-900'
                       }`}
                     >
                       {slot}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               ) : (
@@ -234,14 +239,14 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
               )}
             </div>
 
-            <button
+            <Button
               onClick={() => setStep(3)}
               disabled={!selectedTime}
-              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
+              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99] border-none h-auto"
             >
               Confirmar Seus Dados
               <ChevronRight className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         )}
 
@@ -264,11 +269,11 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
             </div>
 
             <div>
-              <label htmlFor="pname" className="text-sm font-medium text-slate-350 flex items-center gap-2 mb-2">
+              <Label htmlFor="pname" className="text-sm font-medium text-slate-350 flex items-center gap-2 mb-2">
                 <User className="w-4 h-4 text-teal-400" />
                 Seu Nome Completo
-              </label>
-              <input
+              </Label>
+              <Input
                 id="pname"
                 type="text"
                 required
@@ -280,22 +285,23 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <button
+              <Button
+                variant="outline"
                 type="button"
                 onClick={() => setStep(2)}
                 disabled={submitting}
-                className="flex-1 bg-slate-900/80 hover:bg-slate-800 border border-white/5 text-slate-300 font-semibold py-3 px-4 rounded-2xl transition-colors cursor-pointer disabled:opacity-50"
+                className="flex-1 bg-slate-900/80 hover:bg-slate-800 border border-white/5 text-slate-300 font-semibold py-3 px-4 rounded-2xl transition-colors cursor-pointer disabled:opacity-50 h-auto"
               >
                 Voltar
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={handleConfirm}
                 disabled={submitting || !patientName.trim()}
-                className="flex-1 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-none h-auto"
               >
                 {submitting ? 'Confirmando...' : 'Confirmar Agendamento'}
-              </button>
+              </Button>
             </div>
           </div>
         )}

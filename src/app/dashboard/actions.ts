@@ -2,6 +2,7 @@
 
 import { auth } from '@/auth';
 import prisma from '@/lib/prisma';
+import { normalizePhone } from '@/utils/phone';
 import { revalidatePath } from 'next/cache';
 import { getAvailableSlots } from '@/app/schedule/actions';
 import { parseTemplate } from '@/utils/template-parser';
@@ -267,11 +268,7 @@ export async function createManualAppointment(data: {
       throw new Error('Por favor, preencha todos os campos obrigatórios.');
     }
 
-    // Normalize phone number (digits only, prepending 55 if Brazilian DDD number provided without country code)
-    let cleanedPhone = customerPhone.replace(/\D/g, '');
-    if (!cleanedPhone.startsWith('55') && (cleanedPhone.length === 10 || cleanedPhone.length === 11)) {
-      cleanedPhone = '55' + cleanedPhone;
-    }
+    const cleanedPhone = normalizePhone(customerPhone);
 
     // 1. Find or create the Customer
     let customer = await prisma.customer.findUnique({
@@ -487,6 +484,58 @@ export async function updateWhatsAppTemplates(templates: {
     return { success: true };
   } catch (error) {
     console.error('[Dashboard Actions] Failed to update WhatsApp templates:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+/**
+ * Updates trigger time settings (reminder hours before appointment)
+ */
+/**
+ * Marks an appointment as COMPLETED (patient attended) or NOSHOW (patient missed).
+ * Only CONFIRMED appointments can be marked.
+ */
+export async function markAppointmentStatus(
+  appointmentId: string,
+  newStatus: 'COMPLETED' | 'NOSHOW'
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new Error('Unauthorized');
+    }
+
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: appointmentId },
+    });
+
+    if (!appointment) {
+      throw new Error('Agendamento não encontrado.');
+    }
+
+    if (appointment.userId !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    if (appointment.status !== 'CONFIRMED') {
+      throw new Error(`Só é possível marcar como "${newStatus === 'COMPLETED' ? 'compareceu' : 'não compareceu'}" agendamentos confirmados. Status atual: ${appointment.status}`);
+    }
+
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: newStatus },
+    });
+
+    console.log(`[Dashboard Actions] Appointment ${appointmentId} marked as ${newStatus}`);
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error('[Dashboard Actions] Failed to mark appointment status:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : String(error),
