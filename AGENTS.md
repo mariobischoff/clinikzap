@@ -23,7 +23,7 @@ npm run dev                             # http://localhost:3000
 | `node tests/test-webhook.js` | Manual webhook test (dev server must be running) |
 | `node tests/test-cron.js` | Manual cron reminder test (dev server must be running) |
 
-There is **no test framework** (no Jest, Vitest, Playwright). Tests are manual scripts.
+Tests are automated with **Vitest**. Run `npm run test` to run the suite, or `npm run test:coverage` to check coverage. Manual webhook/cron test scripts are also available.
 
 ## Architecture
 
@@ -69,3 +69,12 @@ There is **no test framework** (no Jest, Vitest, Playwright). Tests are manual s
 - `AUTH_SECRET` — NextAuth encryption secret
 - `CRON_SECRET` — optional bearer token for cron endpoint
 - `REDIS_URL` — Redis connection (prod only)
+
+## Padrões de Qualidade de Código
+
+- **TypeScript Estrito**: Sempre usar TypeScript estrito. Sem `any`, sem `as unknown`, sem type assertions desnecessários. Tipagem explícita em funções e APIs.
+- **Tamanho de Funções**: Máximo 40 linhas por função. Se ultrapassar, extrair helpers com nomes descritivos.
+- **Comentários**: Nenhum comentário óbvio do "o que" o código faz. Comentar apenas o "porquê" em casos de restrições complexas, invariantes sutis ou workarounds.
+- **Tratamento de Erros**: Nunca engolir erros silenciosamente. Todo `catch` deve registrar com `console.error` ou propagar. Validar inputs nas bordas externas (APIs, formulários); confiar no código interno.
+- **Segurança**: Nunca hardcodar secrets, senhas ou tokens. Usar sempre variáveis de ambiente.
+- **Decisões e Mudanças**: Interpretar ambiguidade com o mais provável e reportar; em caso de mudanças complexas ou irreversíveis, confirmar antes.
