@@ -291,9 +291,9 @@ await prisma.availabilityException.upsert({
 
 Todas as tabelas têm índice na PK (`id` UUID). O PostgreSQL cria automaticamente um índice B-tree para PKs e unique constraints.
 
-### 5.3 Índices Recomendados para Performance
+### 5.3 Índices Implementados
 
-Com base nos padrões de consulta identificados, recomenda-se adicionar:
+Os seguintes índices compostos foram adicionados ao schema (`prisma/schema.prisma`):
 
 ```prisma
 model Appointment {

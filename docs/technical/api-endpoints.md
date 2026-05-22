@@ -220,9 +220,9 @@ Authorization: Bearer <CRON_SECRET>
 
 ### POST /api/appointments/cancel
 
-Cancela um agendamento usando seu token público.
+Cancela um agendamento.
 
-**Autenticação:** Nenhuma (usa o token como segurança)
+**Autenticação:** Requer sessão ativa (session cookie via NextAuth). Usuário deve ser dono do agendamento.
 
 **Request Body:**
 
@@ -279,7 +279,7 @@ Cancela um agendamento usando seu token público.
 
 Cria um novo agendamento pendente a partir de um existente (cancelando o original). Usado pela clínica para solicitar reagendamento.
 
-**Autenticação:** Mockada (atualmente retorna sempre `session active = true`)
+**Autenticação:** Requer sessão ativa (session cookie via NextAuth). Usuário deve ser dono do agendamento original.
 
 **Request Body:**
 

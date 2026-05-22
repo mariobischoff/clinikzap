@@ -378,3 +378,24 @@ Atualmente o sistema utiliza **logs estruturados no console** com prefixos por m
 | `[Cron Reminders]` | Cron de lembretes |
 
 > **Nota:** Não há sistema de monitoramento formal (APM, tracing ou métricas). Recomenda-se a implementação futura de Sentry ou similar para erro tracking.
+
+## Changelog — Sprint 4 (Maio/2026)
+
+### Testes
+- Framework: Vitest com 24 testes (4 arquivos)
+- Mock: Prisma mock + ioredis-mock (Redis mockado)
+- Cobertura: template-parser, webhook handler, schedule actions, cron reminders
+- Seed script: `prisma/seed.ts` com clínica, customer, appointments CONFIRMED + PENDING
+
+### Correções de segurança
+- Cancel/reschedule: agora exigem sessão ativa (`auth()`)
+- Anti-flood lock: atômico com `SET NX` (elimina race condition)
+- `confirmAppointment`: CAS com `updateMany` + `status: PENDING` no WHERE — elimina double-booking
+
+### Correções de integridade
+- Webhook: customer + appointment criados em transação (`$transaction`)
+- Cron reminders: lock Redis distribuído (`SET NX`) + CAS no `reminderSent`
+- Redis: fallback se Redis estiver indisponível (webhook não quebra)
+
+### Banco de Dados
+- Novos índices: `[userId+status+appointmentDate]` e `[status+reminderSent+appointmentDate]`
