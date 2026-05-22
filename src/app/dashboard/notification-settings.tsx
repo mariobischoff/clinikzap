@@ -105,7 +105,7 @@ export default function NotificationSettings({
       {/* Forms column */}
       <div className="lg:col-span-7 space-y-6">
         {/* Reminder Hours Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-lg">
+        <div className="glass-panel rounded-3xl p-6 space-y-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl">
               <Clock className="w-5 h-5" />
@@ -125,14 +125,14 @@ export default function NotificationSettings({
               max="168"
               value={reminderHours}
               onChange={(e) => setReminderHours(Number(e.target.value))}
-              className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-slate-700 transition-all font-mono"
+              className="w-full glass-input rounded-2xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none transition-all font-mono"
             />
             <span className="text-xs text-slate-400 font-semibold shrink-0">horas antes</span>
           </div>
         </div>
 
         {/* WhatsApp Templates Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-6 shadow-lg">
+        <div className="glass-panel rounded-3xl p-6 space-y-6">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-teal-500/10 text-teal-400 border border-teal-500/20 rounded-xl">
               <MessageSquare className="w-5 h-5" />
@@ -168,7 +168,7 @@ export default function NotificationSettings({
                 value={confirmationTemplate}
                 onChange={(e) => setConfirmationTemplate(e.target.value)}
                 rows={4}
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-slate-750 resize-y leading-relaxed font-mono"
+                className="w-full glass-input rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-600 focus:outline-none resize-y leading-relaxed font-mono"
               />
             </div>
 
@@ -193,7 +193,7 @@ export default function NotificationSettings({
                 value={cancellationTemplate}
                 onChange={(e) => setCancellationTemplate(e.target.value)}
                 rows={3}
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-slate-750 resize-y leading-relaxed font-mono"
+                className="w-full glass-input rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-600 focus:outline-none resize-y leading-relaxed font-mono"
               />
             </div>
 
@@ -218,7 +218,7 @@ export default function NotificationSettings({
                 value={reminderTemplate}
                 onChange={(e) => setReminderTemplate(e.target.value)}
                 rows={4}
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-slate-750 resize-y leading-relaxed font-mono"
+                className="w-full glass-input rounded-2xl p-4 text-xs text-slate-200 placeholder-slate-600 focus:outline-none resize-y leading-relaxed font-mono"
               />
             </div>
           </div>
@@ -244,7 +244,7 @@ export default function NotificationSettings({
           <span className="text-xs font-bold text-slate-400 block text-center uppercase tracking-wider">Simulador WhatsApp</span>
 
           {/* Preview Tabs selectors */}
-          <div className="flex bg-slate-900 border border-slate-850 p-1.5 rounded-2xl gap-1">
+          <div className="flex bg-slate-950/40 backdrop-blur-md border border-white/5 p-1.5 rounded-2xl gap-1">
             {(['confirmation', 'cancellation', 'reminder'] as const).map((tab) => (
               <button
                 key={tab}

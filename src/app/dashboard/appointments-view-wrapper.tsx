@@ -37,7 +37,7 @@ export default function AppointmentsViewWrapper({
     <div className="space-y-4">
       {/* View switcher control at the top right of the section */}
       <div className="flex justify-end">
-        <div className="flex bg-slate-950 p-1 rounded-2xl border border-slate-850 shadow-inner">
+        <div className="flex bg-slate-950/40 backdrop-blur-md p-1 rounded-2xl border border-white/5 shadow-inner">
           <button
             type="button"
             onClick={() => setViewMode('list')}
@@ -66,7 +66,7 @@ export default function AppointmentsViewWrapper({
       </div>
 
       {/* Renders the selected panel component dynamically */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-lg transition-all duration-300">
+      <div className="glass-panel rounded-3xl p-6 transition-all duration-300">
         {viewMode === 'list' ? (
           <AppointmentsTable initialAppointments={initialAppointments} />
         ) : (

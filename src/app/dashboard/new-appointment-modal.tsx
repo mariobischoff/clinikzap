@@ -244,10 +244,10 @@ export default function NewAppointmentModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', duration: 0.5 }}
-            className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl z-10 max-h-[90vh] flex flex-col"
+            className="relative w-full max-w-lg glass-panel rounded-3xl overflow-hidden z-10 max-h-[90vh] flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-800">
+            <div className="flex items-center justify-between p-6 border-b border-white/5">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-teal-400" />
                 <h2 className="text-xl font-bold text-slate-100">Novo Agendamento</h2>
@@ -290,7 +290,7 @@ export default function NewAppointmentModal({
                     onChange={handleNameChange}
                     onFocus={() => setShowSuggestions(suggestions.length > 0)}
                     placeholder="Digite o nome do paciente..."
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-teal-500/50 rounded-2xl px-4 py-3 text-slate-200 text-sm focus:outline-none transition-all placeholder:text-slate-600"
+                    className="w-full glass-input focus:border-teal-500/50 rounded-2xl px-4 py-3 text-slate-200 text-sm focus:outline-none transition-all placeholder:text-slate-600"
                   />
                   {isSearching && (
                     <div className="absolute right-3.5 top-3.5">
@@ -306,7 +306,7 @@ export default function NewAppointmentModal({
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -5 }}
-                      className="absolute left-0 right-0 top-full mt-1.5 bg-slate-950 border border-slate-800 rounded-2xl shadow-xl z-20 max-h-48 overflow-y-auto divide-y divide-slate-900"
+                      className="absolute left-0 right-0 top-full mt-1.5 bg-slate-950/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-20 max-h-48 overflow-y-auto divide-y divide-white/5"
                     >
                       {suggestions.map((cust) => (
                         <button
@@ -338,7 +338,7 @@ export default function NewAppointmentModal({
                   value={customerPhone}
                   onChange={handlePhoneChange}
                   placeholder="(11) 99999-9999"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-teal-500/50 rounded-2xl px-4 py-3 text-slate-200 text-sm focus:outline-none transition-all placeholder:text-slate-600 font-mono"
+                  className="w-full glass-input focus:border-teal-500/50 rounded-2xl px-4 py-3 text-slate-200 text-sm focus:outline-none transition-all placeholder:text-slate-600 font-mono"
                 />
                 <p className="text-[10px] text-slate-500">
                   Um disparo automático de confirmação será enviado a este número.
@@ -356,7 +356,7 @@ export default function NewAppointmentModal({
                   min={getMinDateStr()}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-teal-500/50 rounded-2xl px-4 py-3 text-slate-200 text-sm focus:outline-none transition-all cursor-pointer select-none"
+                  className="w-full glass-input focus:border-teal-500/50 rounded-2xl px-4 py-3 text-slate-200 text-sm focus:outline-none transition-all cursor-pointer select-none [color-scheme:dark]"
                 />
               </div>
 
@@ -393,7 +393,7 @@ export default function NewAppointmentModal({
                           className={`py-2 px-1 rounded-xl text-xs font-semibold font-mono border transition-all cursor-pointer text-center ${
                             isSelected
                               ? 'bg-teal-500 text-slate-950 border-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.25)] font-bold'
-                              : 'bg-slate-950 border-slate-800 text-slate-350 hover:border-slate-700 hover:text-slate-200'
+                              : 'bg-slate-950/40 border-white/5 text-slate-350 hover:border-white/10 hover:text-slate-200'
                           }`}
                         >
                           {s}
@@ -405,12 +405,12 @@ export default function NewAppointmentModal({
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-slate-800 mt-2">
+              <div className="flex gap-3 pt-4 border-t border-white/5 mt-2">
                 <button
                   type="button"
                   onClick={handleClose}
                   disabled={isPending}
-                  className="flex-1 py-3 px-4 bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-300 rounded-2xl text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+                  className="flex-1 py-3 px-4 bg-slate-950/40 hover:bg-slate-900/40 border border-white/5 text-slate-300 rounded-2xl text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
                 >
                   Cancelar
                 </button>

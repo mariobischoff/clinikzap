@@ -85,7 +85,7 @@ export default function AppointmentsTable({ initialAppointments }: AppointmentsT
           </button>
 
           {/* Filter controls */}
-          <div className="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-850 self-start">
+          <div className="flex bg-slate-950/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/5 self-start">
           <button
             type="button"
             onClick={() => setFilter('active')}
@@ -124,7 +124,7 @@ export default function AppointmentsTable({ initialAppointments }: AppointmentsT
     </div>
 
       {filteredAppointments.length === 0 ? (
-        <div className="text-center py-12 text-slate-500 text-sm bg-slate-900/20 border border-slate-850 rounded-3xl">
+        <div className="text-center py-12 text-slate-500 text-sm bg-slate-950/20 border border-white/5 rounded-3xl backdrop-blur-md">
           Nenhum agendamento encontrado para este filtro.
         </div>
       ) : (

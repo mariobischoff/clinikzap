@@ -84,7 +84,7 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Left side: Add exception form */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 space-y-6">
+      <div className="glass-panel rounded-3xl p-6 space-y-6">
         <div>
           <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
             <Plus className="w-5 h-5 text-teal-400" />
@@ -106,7 +106,7 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
             min={todayStr}
             value={dateStr}
             onChange={(e) => setDateStr(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-slate-200 focus:outline-none focus:border-teal-500/50 transition-all text-sm [color-scheme:dark]"
+            className="w-full glass-input rounded-2xl px-4 py-3 text-slate-200 focus:outline-none focus:border-teal-500/50 transition-all text-sm [color-scheme:dark]"
           />
         </div>
 
@@ -120,7 +120,7 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
               className={`p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer flex flex-col items-center justify-center gap-2 ${
                 blockAllDay
                   ? 'bg-red-500/10 border-red-500/30 text-red-400'
-                  : 'bg-slate-950 border-slate-900 text-slate-500 hover:border-slate-800'
+                  : 'bg-slate-950/40 border-white/5 text-slate-500 hover:border-white/10'
               }`}
             >
               <Ban className="w-5 h-5" />
@@ -133,7 +133,7 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
               className={`p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer flex flex-col items-center justify-center gap-2 ${
                 !blockAllDay
                   ? 'bg-teal-500/10 border-teal-500/30 text-teal-400'
-                  : 'bg-slate-950 border-slate-900 text-slate-500 hover:border-slate-800'
+                  : 'bg-slate-950/40 border-white/5 text-slate-500 hover:border-white/10'
               }`}
             >
               <Clock className="w-5 h-5" />
@@ -158,8 +158,8 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
                     onClick={() => handleToggleSlot(slot)}
                     className={`p-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer text-center ${
                       isSelected
-                        ? 'bg-teal-500/10 border-teal-500/30 text-teal-400'
-                        : 'bg-slate-950 border-slate-900 hover:border-slate-850 text-slate-500'
+                        ? 'bg-teal-500/10 border-teal-500/30 text-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.05)]'
+                        : 'bg-slate-950/40 border-white/5 hover:border-white/10 text-slate-500'
                     }`}
                   >
                     {slot}
@@ -195,7 +195,7 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
       </div>
 
       {/* Right side: List of current exceptions */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 space-y-6 flex flex-col justify-between">
+      <div className="glass-panel rounded-3xl p-6 space-y-6 flex flex-col justify-between">
         <div className="space-y-4">
           <div>
             <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
@@ -222,7 +222,7 @@ export default function ExceptionSettings({ exceptions, duration }: ExceptionSet
                 return (
                   <div
                     key={exc.id}
-                    className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex items-center justify-between gap-4"
+                    className="p-4 bg-slate-950/40 border border-white/5 rounded-2xl flex items-center justify-between gap-4"
                   >
                     <div className="space-y-1">
                       <span className="text-sm font-bold text-slate-100">{formattedDate}</span>

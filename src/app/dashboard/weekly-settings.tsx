@@ -112,7 +112,7 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
   return (
     <div className="space-y-6">
       {/* Configuration of default slot duration */}
-      <div className="bg-slate-950/40 border border-slate-850 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="glass-panel rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
             <Clock className="w-5 h-5 text-teal-400" />
@@ -129,7 +129,7 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
             value={duration}
             disabled={isUpdatingDuration}
             onChange={(e) => handleDurationChange(Number(e.target.value))}
-            className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-teal-500/50 transition-all cursor-pointer [color-scheme:dark]"
+            className="glass-input rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-teal-500/50 transition-all cursor-pointer [color-scheme:dark]"
           >
             <option value={30}>30 minutos</option>
             <option value={45}>45 minutos</option>
@@ -157,8 +157,8 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
                   onClick={() => setSelectedDay(day.index)}
                   className={`w-full text-left px-4 py-3 rounded-2xl flex items-center justify-between border text-sm font-semibold transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-teal-500/10 border-teal-500/30 text-teal-400'
-                      : 'bg-slate-950 border-slate-900 text-slate-400 hover:bg-slate-900/50 hover:text-slate-200'
+                      ? 'bg-teal-500/10 border-teal-500/30 text-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.05)]'
+                      : 'bg-slate-950/40 border-white/5 text-slate-400 hover:bg-slate-900/40 hover:text-slate-200'
                   }`}
                 >
                   <span className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
         </div>
 
         {/* Right Side: Slots configuration grid for active day */}
-        <div className="flex-1 bg-slate-900/50 border border-slate-800 rounded-3xl p-6 space-y-6">
+        <div className="flex-1 glass-panel rounded-3xl p-6 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
@@ -196,14 +196,14 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
               <button
                 type="button"
                 onClick={handleSelectAllForDay}
-                className="px-3 py-1.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                className="px-3 py-1.5 bg-slate-950/40 hover:bg-slate-900/40 border border-white/5 text-slate-400 hover:text-slate-200 text-xs font-semibold rounded-xl transition-all cursor-pointer"
               >
                 Selecionar Todos
               </button>
               <button
                 type="button"
                 onClick={handleClearAllForDay}
-                className="px-3 py-1.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                className="px-3 py-1.5 bg-slate-950/40 hover:bg-slate-900/40 border border-white/5 text-slate-400 hover:text-slate-200 text-xs font-semibold rounded-xl transition-all cursor-pointer"
               >
                 Limpar Todos
               </button>
@@ -222,7 +222,7 @@ export default function WeeklySettings({ initialWeeklyHours, initialDuration }: 
                   className={`p-3.5 rounded-2xl border text-sm font-semibold transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
                     isSelected
                       ? 'bg-teal-500/10 border-teal-500/40 text-teal-400 shadow-[0_0_12px_rgba(20,184,166,0.08)]'
-                      : 'bg-slate-950 border-slate-900 hover:border-slate-800 text-slate-500 hover:text-slate-400'
+                      : 'bg-slate-950/40 border-white/5 hover:border-white/10 text-slate-500 hover:text-slate-400'
                   }`}
                 >
                   <span>{slot}</span>

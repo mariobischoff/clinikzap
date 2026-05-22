@@ -25,7 +25,7 @@ export default function AvailabilitySettings({
   const [subTab, setSubTab] = useState<'weekly' | 'exceptions'>('weekly');
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-lg space-y-6">
+    <div className="glass-panel rounded-3xl p-6 space-y-6">
       {/* Sub tabs header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
@@ -39,7 +39,7 @@ export default function AvailabilitySettings({
         </div>
 
         {/* Sub Navigation */}
-        <div className="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-850 self-start">
+        <div className="flex bg-slate-950/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/5 self-start">
           <button
             type="button"
             onClick={() => setSubTab('weekly')}

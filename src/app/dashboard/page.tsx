@@ -68,22 +68,22 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       {/* Metrics Widgets */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg">
+        <div className="glass-panel glass-panel-hover rounded-3xl p-5">
           <span className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total</span>
           <p className="text-3xl font-bold mt-2 text-slate-100">{total}</p>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg">
+        <div className="glass-panel glass-panel-hover rounded-3xl p-5">
           <span className="text-teal-400 text-xs font-semibold uppercase tracking-wider">Confirmados</span>
           <p className="text-3xl font-bold mt-2 text-teal-400">{confirmed}</p>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg">
+        <div className="glass-panel glass-panel-hover rounded-3xl p-5">
           <span className="text-indigo-400 text-xs font-semibold uppercase tracking-wider">Pendentes</span>
           <p className="text-3xl font-bold mt-2 text-indigo-400">{pending}</p>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg">
+        <div className="glass-panel glass-panel-hover rounded-3xl p-5">
           <span className="text-red-400 text-xs font-semibold uppercase tracking-wider">Cancelados</span>
           <p className="text-3xl font-bold mt-2 text-red-400">{canceled}</p>
         </div>

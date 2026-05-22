@@ -285,7 +285,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Date Display and Navigation */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-slate-950 rounded-2xl border border-slate-850 p-1">
+          <div className="flex items-center bg-slate-950/40 border border-white/5 backdrop-blur-md rounded-2xl p-1">
             <button
               type="button"
               onClick={handlePrev}
@@ -329,7 +329,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
         {/* View Mode Switcher and Create Button */}
         <div className="flex items-center gap-3 self-start sm:self-auto">
           {/* Mês / Semana Toggles */}
-          <div className="flex bg-slate-950 p-1 rounded-2xl border border-slate-850">
+          <div className="flex bg-slate-950/40 backdrop-blur-md border border-white/5 p-1 rounded-2xl">
             <button
               type="button"
               onClick={() => setViewMode('month')}
@@ -371,9 +371,9 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
 
       {/* MONTH VIEW GRID */}
       {viewMode === 'month' && (
-        <div className="border border-slate-850 rounded-3xl overflow-hidden bg-slate-950">
+        <div className="border border-white/5 rounded-3xl overflow-hidden bg-[#070b14]/50 backdrop-blur-xl">
           {/* Weekday headers */}
-          <div className="grid grid-cols-7 border-b border-slate-850 bg-slate-900/60">
+          <div className="grid grid-cols-7 border-b border-white/5 bg-slate-900/40">
             {WEEKDAY_NAMES.map((name) => (
               <div key={name} className="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
                 {name}
@@ -382,7 +382,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
           </div>
 
           {/* Days Grid */}
-          <div className="grid grid-cols-7 divide-x divide-y divide-slate-850/70 border-t border-slate-850/70">
+          <div className="grid grid-cols-7 divide-x divide-y divide-white/5 border-t border-white/5">
             {monthDays.map((day, idx) => {
               const dateStr = getISODateStr(day);
               const dayApps = appointmentsByDate[dateStr] || [];
@@ -393,7 +393,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                 <div
                   key={idx}
                   className={`min-h-[110px] p-2 flex flex-col group relative transition-colors ${
-                    isCurrentMonth ? 'bg-slate-900/20' : 'bg-slate-950/20 text-slate-600'
+                    isCurrentMonth ? 'bg-slate-900/10' : 'bg-slate-950/10 text-slate-600'
                   } hover:bg-slate-900/30`}
                 >
                   {/* Day number & Quick Add */}
@@ -456,7 +456,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                           setCurrentDate(day);
                           setViewMode('week');
                         }}
-                        className="w-full text-center py-0.5 text-[10px] text-teal-400 hover:text-teal-350 font-bold block bg-slate-900 border border-slate-800 rounded-lg hover:border-slate-700 cursor-pointer"
+                        className="w-full text-center py-0.5 text-[10px] text-teal-400 hover:text-teal-350 font-bold block bg-slate-950/40 border border-white/5 rounded-lg hover:border-white/10 cursor-pointer"
                       >
                         + {dayApps.length - 3} mais
                       </button>
@@ -471,11 +471,11 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
 
       {/* WEEK VIEW GRID */}
       {viewMode === 'week' && (
-        <div className="border border-slate-850 rounded-3xl overflow-hidden bg-slate-950 flex flex-col">
+        <div className="border border-white/5 rounded-3xl overflow-hidden bg-[#070b14]/50 backdrop-blur-xl flex flex-col">
           {/* Header Row */}
-          <div className="grid grid-cols-8 border-b border-slate-850 bg-slate-900/60 text-center font-bold text-xs uppercase tracking-wider">
+          <div className="grid grid-cols-8 border-b border-white/5 bg-slate-900/40 text-center font-bold text-xs uppercase tracking-wider">
             {/* Hour column empty header */}
-            <div className="py-4 border-r border-slate-850/50 text-slate-500 text-[10px] flex items-center justify-center">
+            <div className="py-4 border-r border-white/5 text-slate-500 text-[10px] flex items-center justify-center">
               Hora
             </div>
             {/* Days columns headers */}
@@ -502,14 +502,14 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
           </div>
 
           {/* Time Slots Rows */}
-          <div className="max-h-[500px] overflow-y-auto scrollbar-thin divide-y divide-slate-850/50">
+          <div className="max-h-[500px] overflow-y-auto scrollbar-thin divide-y divide-white/5">
             {HOURS.map((hr) => {
               const hourLabel = `${String(hr).padStart(2, '0')}:00`;
 
               return (
                 <div key={hr} className="grid grid-cols-8 min-h-[70px]">
                   {/* Hour Label */}
-                  <div className="border-r border-slate-850/50 pr-2 pt-2 text-right text-[10px] font-bold text-slate-500 font-mono">
+                  <div className="border-r border-white/5 pr-2 pt-2 text-right text-[10px] font-bold text-slate-500 font-mono">
                     {hourLabel}
                   </div>
 
@@ -527,7 +527,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                     return (
                       <div
                         key={dayIdx}
-                        className="p-1 border-r border-slate-850/20 hover:bg-slate-900/10 transition-colors relative group flex flex-col gap-1 justify-start"
+                        className="p-1 border-r border-white/5 hover:bg-slate-900/10 transition-colors relative group flex flex-col gap-1 justify-start"
                       >
                         {/* Quick Add Button on hover */}
                         <button
@@ -590,10 +590,10 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
 
             {/* Modal Box */}
             <div
-              className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl z-10 p-6 space-y-6"
+              className="relative w-full max-w-md glass-panel rounded-3xl overflow-hidden z-10 p-6 space-y-6"
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-850 pb-4">
+              <div className="flex items-center justify-between border-b border-white/5 pb-4">
                 <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                   <CalendarIcon className="w-5 h-5 text-teal-400" />
                   Detalhes do Agendamento
@@ -610,7 +610,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
               {/* Details Body */}
               <div className="space-y-4 text-sm">
                 {/* Patient */}
-                <div className="flex items-start gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-850">
+                <div className="flex items-start gap-3 bg-slate-950/40 border border-white/5 p-4 rounded-2xl">
                   <User className="w-5 h-5 text-slate-500 mt-0.5" />
                   <div>
                     <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Paciente</span>
@@ -619,7 +619,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                 </div>
 
                 {/* Phone & WhatsApp Link */}
-                <div className="flex items-start gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-850">
+                <div className="flex items-start gap-3 bg-slate-950/40 border border-white/5 p-4 rounded-2xl">
                   <Phone className="w-5 h-5 text-slate-500 mt-0.5" />
                   <div className="flex-1">
                     <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">WhatsApp</span>
@@ -639,7 +639,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
 
                 {/* Date & Time & Status */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-start gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-850">
+                  <div className="flex items-start gap-3 bg-slate-950/40 border border-white/5 p-4 rounded-2xl">
                     <Clock className="w-5 h-5 text-slate-500 mt-0.5" />
                     <div>
                       <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Horário</span>
@@ -664,7 +664,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-850">
+                  <div className="flex items-start gap-3 bg-slate-950/40 border border-white/5 p-4 rounded-2xl">
                     <CheckCircle2 className="w-5 h-5 text-slate-500 mt-0.5" />
                     <div>
                       <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Status</span>
@@ -690,19 +690,19 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
                 </div>
 
                 {/* Token / Copy Link Section */}
-                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 space-y-2">
+                <div className="bg-slate-950/40 border border-white/5 p-4 rounded-2xl space-y-2">
                   <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block">Link de Agendamento</span>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       readOnly
                       value={`${window.location.origin}/schedule/${selectedApp.token}`}
-                      className="bg-slate-900 border border-slate-800 text-xs text-slate-400 rounded-xl px-3 py-2 flex-1 focus:outline-none font-mono"
+                      className="glass-input text-xs text-slate-400 rounded-xl px-3 py-2 flex-1 focus:outline-none font-mono"
                     />
                     <button
                       type="button"
                       onClick={() => handleCopyLink(selectedApp.token)}
-                      className="px-3 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl text-xs font-bold text-teal-400 transition-colors flex items-center justify-center cursor-pointer active:scale-95"
+                      className="px-3 bg-slate-950/40 border border-white/5 hover:border-white/10 rounded-xl text-xs font-bold text-teal-400 transition-colors flex items-center justify-center cursor-pointer active:scale-95"
                     >
                       {copiedToken ? 'Copiado!' : <Copy className="w-3.5 h-3.5" />}
                     </button>
@@ -712,7 +712,7 @@ export default function AppointmentsCalendar({ appointments }: AppointmentsCalen
 
               {/* Actions Footer */}
               {selectedApp.status !== 'CANCELED' && (
-                <div className="flex gap-3 pt-4 border-t border-slate-850">
+                <div className="flex gap-3 pt-4 border-t border-white/5">
                   <button
                     type="button"
                     disabled={isPendingAction}

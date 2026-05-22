@@ -126,7 +126,7 @@ export default function AnalyticsPanel({ appointments }: AnalyticsPanelProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Chart 1: Donut Chart Status Distribution */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col space-y-6 shadow-lg">
+      <div className="glass-panel rounded-3xl p-6 flex flex-col space-y-6">
         <div>
           <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
             <CheckCircle2 className="w-4.5 h-4.5 text-teal-400" />
@@ -202,7 +202,7 @@ export default function AnalyticsPanel({ appointments }: AnalyticsPanelProps) {
       </div>
 
       {/* Chart 2: Area / Line Chart Booking Trend */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col space-y-6 shadow-lg">
+      <div className="glass-panel rounded-3xl p-6 flex flex-col space-y-6">
         <div>
           <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
             <TrendingUp className="w-4.5 h-4.5 text-indigo-400" />

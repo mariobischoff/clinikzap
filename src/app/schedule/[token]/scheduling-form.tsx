@@ -107,14 +107,14 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-100 p-4 relative">
+    <main className="min-h-screen flex items-center justify-center bg-[#030712] text-slate-100 p-4 relative overflow-hidden">
       {/* Decorative Blur Backgrounds */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-teal-500/10 rounded-full blur-[100px] animate-float" />
+        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '3s' }} />
       </div>
 
-      <div className="relative w-full max-w-lg bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+      <div className="relative w-full max-w-lg glass-panel rounded-3xl p-6 md:p-8 shadow-2xl z-10">
         
         {/* Step Indicator Header (Hide on Success Step) */}
         {step < 4 && (
@@ -130,7 +130,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
                 <div
                   key={s}
                   className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                    s <= step ? 'bg-teal-500' : 'bg-slate-800'
+                    s <= step ? 'bg-gradient-to-r from-teal-500 to-indigo-500' : 'bg-slate-800'
                   }`}
                 />
               ))}
@@ -149,7 +149,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
         {step === 1 && (
           <div className="space-y-6">
             <div>
-              <label className="text-sm font-medium text-slate-300 flex items-center gap-2 mb-3">
+              <label className="text-sm font-medium text-slate-350 flex items-center gap-2 mb-3">
                 <CalendarIcon className="w-4 h-4 text-teal-400" />
                 Selecione o Dia da Consulta
               </label>
@@ -162,8 +162,8 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
                     onClick={() => setSelectedDate(d.fullDate)}
                     className={`flex flex-col items-center justify-center p-3 rounded-2xl min-w-[70px] border transition-all cursor-pointer ${
                       selectedDate === d.fullDate
-                        ? 'bg-gradient-to-br from-teal-500 to-teal-600 border-teal-400 text-white shadow-lg shadow-teal-500/20 scale-[1.03]'
-                        : 'bg-slate-800/40 border-slate-700/50 text-slate-300 hover:border-slate-600'
+                        ? 'bg-gradient-to-br from-teal-500 to-indigo-550 border-teal-400 text-white shadow-lg shadow-teal-500/20 scale-[1.03]'
+                        : 'bg-slate-900/60 border-white/5 text-slate-300 hover:border-teal-500/40 hover:bg-slate-900'
                     }`}
                   >
                     <span className="text-xs uppercase font-medium tracking-wider opacity-80">
@@ -180,7 +180,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
             <button
               onClick={() => setStep(2)}
               disabled={!selectedDate}
-              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
             >
               Escolher Horário
               <ChevronRight className="w-4 h-4" />
@@ -193,7 +193,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
           <div className="space-y-6">
             <div>
               <div className="flex justify-between items-center mb-3">
-                <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                <label className="text-sm font-medium text-slate-350 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-teal-400" />
                   Horários para {getFormattedSelectedDate()}
                 </label>
@@ -208,7 +208,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
               {loadingSlots ? (
                 <div className="grid grid-cols-3 gap-3 py-6">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div key={i} className="h-12 bg-slate-800/50 rounded-2xl animate-pulse" />
+                    <div key={i} className="h-12 bg-slate-900/50 border border-white/5 rounded-2xl animate-pulse" />
                   ))}
                 </div>
               ) : availableSlots.length > 0 ? (
@@ -219,8 +219,8 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
                       onClick={() => setSelectedTime(slot)}
                       className={`py-3 rounded-2xl border font-semibold text-center transition-all cursor-pointer ${
                         selectedTime === slot
-                          ? 'bg-gradient-to-br from-teal-500 to-teal-600 border-teal-400 text-white shadow-lg shadow-teal-500/20'
-                          : 'bg-slate-800/40 border-slate-700/50 text-slate-300 hover:border-slate-600'
+                          ? 'bg-gradient-to-br from-teal-500 to-indigo-550 border-teal-400 text-white shadow-lg shadow-teal-500/20'
+                          : 'bg-slate-900/60 border-white/5 text-slate-300 hover:border-teal-500/40 hover:bg-slate-900'
                       }`}
                     >
                       {slot}
@@ -237,7 +237,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
             <button
               onClick={() => setStep(3)}
               disabled={!selectedTime}
-              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
             >
               Confirmar Seus Dados
               <ChevronRight className="w-4 h-4" />
@@ -248,7 +248,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
         {/* STEP 3: PATIENT CONFIRMATION FORM */}
         {step === 3 && (
           <div className="space-y-6">
-            <div className="bg-slate-800/40 border border-slate-800 rounded-2xl p-4 space-y-2 text-sm text-slate-300">
+            <div className="bg-slate-900/80 border border-white/5 rounded-2xl p-5 space-y-2 text-sm text-slate-300">
               <div className="flex justify-between">
                 <span>Clínica:</span>
                 <span className="font-semibold text-slate-100">{appointment.user.name}</span>
@@ -264,7 +264,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
             </div>
 
             <div>
-              <label htmlFor="pname" className="text-sm font-medium text-slate-300 flex items-center gap-2 mb-2">
+              <label htmlFor="pname" className="text-sm font-medium text-slate-350 flex items-center gap-2 mb-2">
                 <User className="w-4 h-4 text-teal-400" />
                 Seu Nome Completo
               </label>
@@ -274,7 +274,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
                 required
                 value={patientName}
                 onChange={(e) => setPatientName(e.target.value)}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 transition-colors text-sm"
+                className="w-full glass-input rounded-2xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none text-sm"
                 placeholder="Como quer ser chamado(a)?"
               />
             </div>
@@ -284,7 +284,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
                 type="button"
                 onClick={() => setStep(2)}
                 disabled={submitting}
-                className="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold py-3 px-4 rounded-2xl transition-colors cursor-pointer disabled:opacity-50"
+                className="flex-1 bg-slate-900/80 hover:bg-slate-800 border border-white/5 text-slate-300 font-semibold py-3 px-4 rounded-2xl transition-colors cursor-pointer disabled:opacity-50"
               >
                 Voltar
               </button>
@@ -292,7 +292,7 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
                 type="button"
                 onClick={handleConfirm}
                 disabled={submitting || !patientName.trim()}
-                className="flex-1 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.01] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-gradient-to-r from-teal-500 to-indigo-500 hover:from-teal-400 hover:to-indigo-400 text-white font-semibold py-3 px-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? 'Confirmando...' : 'Confirmar Agendamento'}
               </button>
@@ -311,19 +311,19 @@ export default function SchedulingForm({ appointment }: SchedulingFormProps) {
             
             <div className="space-y-2">
               <h2 className="text-2xl font-bold text-slate-100">Agendamento Confirmado!</h2>
-              <p className="text-slate-400 text-sm max-w-xs mx-auto">
+              <p className="text-slate-400 text-sm max-w-xs mx-auto leading-relaxed">
                 Tudo certo, {patientName}! Sua consulta na clínica <strong>{appointment.user.name}</strong> foi reservada.
               </p>
             </div>
 
-            <div className="bg-slate-800/40 border border-slate-800 rounded-2xl p-5 max-w-sm mx-auto text-sm text-slate-300 space-y-2">
+            <div className="bg-slate-900/80 border border-white/5 rounded-2xl p-5 max-w-sm mx-auto text-sm text-slate-300 space-y-2 text-left">
               <div className="flex justify-between">
                 <span>Data:</span>
                 <span className="font-semibold text-slate-100">{getFormattedSelectedDate()}</span>
               </div>
               <div className="flex justify-between">
                 <span>Horário:</span>
-                <span className="font-semibold text-teal-400">{selectedTime}</span>
+                <span className="font-semibold text-teal-450">{selectedTime}</span>
               </div>
               <div className="flex justify-between">
                 <span>Paciente:</span>
